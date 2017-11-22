@@ -50,6 +50,7 @@ public class TelaEnviando extends JFrame {
 		JButton continuar = new JButton("Continuar");
 		continuar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
 			}
 		});
 		continuar.setBounds(220, 246, 117, 25);
