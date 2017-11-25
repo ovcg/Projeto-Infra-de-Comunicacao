@@ -1,6 +1,6 @@
 package base;
 //Classe para calcular o RTT
-public class RTT {
+public class RTTEnviando {
 
 	private int segundos;
 }

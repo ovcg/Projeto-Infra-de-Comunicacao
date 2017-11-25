@@ -35,7 +35,6 @@ public class TelaInicial extends JFrame implements Serializable {
 	private JLabel lblEndereoDestino;
 	private JLabel lblPortaDestino;
 	private JLabel lblTamanhoDoArquivo;
-	private JLabel lblTransfer;
 	private Cliente cliente;
 	private JButton button_1;
 	private JButton button_2;
@@ -73,7 +72,7 @@ public class TelaInicial extends JFrame implements Serializable {
 
 		textFieldIp = new JTextField();
 		textFieldIp.setColumns(10);
-		textFieldIp.setBounds(172, 80, 300, 19);
+		textFieldIp.setBounds(100, 12, 117, 19);
 		contentPane.add(textFieldIp);
 
 		JButton button = new JButton("Enviar");
@@ -81,23 +80,22 @@ public class TelaInicial extends JFrame implements Serializable {
 			public void actionPerformed(ActionEvent arg0) {
 				int port=Integer.parseInt(textFieldIp.getText());
 				
-				cliente=new Cliente(textFieldIp.getText(),port);
-				
-				cliente.start();
 			}
 		});
-		button.setBounds(25, 255, 117, 25);
+		button.setBounds(48, 136, 117, 25);
 		contentPane.add(button);
 
 		textFieldPort = new JTextField();
 		textFieldPort.setColumns(10);
-		textFieldPort.setBounds(172, 111, 300, 19);
+		textFieldPort.setBounds(322, 12, 75, 19);
 		contentPane.add(textFieldPort);
-
+		
+		JFileChooser fc = new JFileChooser();
+		
 		JButton btnNewButton = new JButton("Escolher Arquivo");
 		btnNewButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JFileChooser fc = new JFileChooser();
+				
 
 				int abrir = fc.showOpenDialog(null);
 				
@@ -113,55 +111,41 @@ public class TelaInicial extends JFrame implements Serializable {
 
 			}
 		});
-		btnNewButton.setBounds(25, 158, 163, 25);
+		btnNewButton.setBounds(48, 61, 163, 25);
 		contentPane.add(btnNewButton);
 
 		lblNomeDoArquivo = new JLabel("Nome do arquivo: ");
-		lblNomeDoArquivo.setBounds(231, 163, 348, 15);
+		lblNomeDoArquivo.setBounds(226, 66, 348, 15);
 		contentPane.add(lblNomeDoArquivo);
 
-		lblEndereoDestino = new JLabel("Endereço destino:");
-		lblEndereoDestino.setBounds(25, 82, 188, 15);
+		lblEndereoDestino = new JLabel("IP:");
+		lblEndereoDestino.setBounds(64, 14, 29, 15);
 		contentPane.add(lblEndereoDestino);
 
-		lblPortaDestino = new JLabel("Porta destino:");
-		lblPortaDestino.setBounds(25, 113, 102, 15);
+		lblPortaDestino = new JLabel("Porta:");
+		lblPortaDestino.setBounds(258, 14, 75, 15);
 		contentPane.add(lblPortaDestino);
 
 		lblTamanhoDoArquivo = new JLabel("Tamanho do Arquivo:");
-		lblTamanhoDoArquivo.setBounds(25, 210, 522, 15);
+		lblTamanhoDoArquivo.setBounds(52, 109, 522, 15);
 		contentPane.add(lblTamanhoDoArquivo);
 
-		lblTransfer = new JLabel("Transfer");
-		lblTransfer.setForeground(Color.GREEN);
-		lblTransfer.setBounds(27, 12, 100, 19);
-		lblTransfer.setSize(100, 50);
-		contentPane.add(lblTransfer);
-
-		JLabel label = new JLabel("Progresso:");
-		label.setBounds(199, 255, 108, 15);
-		contentPane.add(label);
+		JLabel lblEnviando = new JLabel("Enviando:");
+		lblEnviando.setBounds(49, 191, 108, 15);
+		contentPane.add(lblEnviando);
 
 		JProgressBar progressBar = new JProgressBar();
 		progressBar.setStringPainted(true);
-		progressBar.setBounds(313, 255, 234, 14);
+		progressBar.setBounds(163, 192, 234, 14);
 		contentPane.add(progressBar);
 
-		JLabel label_1 = new JLabel("Status:");
-		label_1.setBounds(35, 297, 70, 15);
-		contentPane.add(label_1);
-
-		JLabel label_2 = new JLabel("Status2");
-		label_2.setBounds(118, 297, 70, 15);
-		contentPane.add(label_2);
-
 		JLabel label_3 = new JLabel("RTT:");
-		label_3.setBounds(288, 297, 70, 15);
+		label_3.setBounds(413, 191, 70, 15);
 		contentPane.add(label_3);
 
-		JLabel label_4 = new JLabel("Tempo");
-		label_4.setBounds(342, 297, 70, 15);
-		contentPane.add(label_4);
+		JLabel lblTempoEstimado = new JLabel("Tempo Estimado:");
+		lblTempoEstimado.setBounds(59, 218, 136, 15);
+		contentPane.add(lblTempoEstimado);
 
 		button_1 = new JButton("Parar");
 		button_1.setBounds(209, 359, 117, 25);
@@ -186,5 +170,22 @@ public class TelaInicial extends JFrame implements Serializable {
 		});
 		button_4.setBounds(48, 359, 117, 25);
 		contentPane.add(button_4);
+		
+		JLabel lblRecebendo = new JLabel("Recebendo:");
+		lblRecebendo.setBounds(48, 245, 108, 15);
+		contentPane.add(lblRecebendo);
+		
+		JProgressBar progressBar_1 = new JProgressBar();
+		progressBar_1.setStringPainted(true);
+		progressBar_1.setBounds(175, 246, 234, 14);
+		contentPane.add(progressBar_1);
+		
+		JLabel label_1 = new JLabel("RTT:");
+		label_1.setBounds(425, 245, 70, 15);
+		contentPane.add(label_1);
+		
+		JLabel label_2 = new JLabel("Tempo");
+		label_2.setBounds(71, 297, 70, 15);
+		contentPane.add(label_2);
 	}
 }
