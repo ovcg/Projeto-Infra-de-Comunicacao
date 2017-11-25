@@ -2,23 +2,33 @@ package controle;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.IOException;
+import java.net.ServerSocket;
 import java.net.Socket;
-
-import base.Pacote;
 
 public class Cliente extends Thread {
 
-	private Pacote pacote;
 	private BufferedInputStream bis;
 	private BufferedOutputStream bos;
 	private Socket socket;
+	private ServerSocket server;
+
 	
 
-	public Cliente(Socket socket) {
-		this.socket = socket;
+	public Cliente(String adress,int port) {
+		try {
+			this.socket = new Socket(adress,port);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		
 	}
-
+	public static void main(String[]args) {
+		
+		
+	}
+	
 
 	@Override
 	public void run() {
