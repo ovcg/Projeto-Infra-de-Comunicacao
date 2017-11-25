@@ -27,8 +27,8 @@ import javax.swing.JProgressBar;
 public class TelaInicial extends JFrame implements Serializable {
 
 	private JPanel contentPane;
-	private JTextField textField;
-	private JTextField textField_1;
+	private JTextField textFieldIp;
+	private JTextField textFieldPort;
 	private String path;
 	private String nomeArquivo;
 	private JLabel lblNomeDoArquivo;
@@ -42,7 +42,7 @@ public class TelaInicial extends JFrame implements Serializable {
 	private JButton button_3;
 	private JButton button_4;
 	private File file;
-	private Socket socket;
+	
 
 	/**
 	 * Launch the application.
@@ -71,14 +71,17 @@ public class TelaInicial extends JFrame implements Serializable {
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
 
-		textField = new JTextField();
-		textField.setColumns(10);
-		textField.setBounds(172, 80, 300, 19);
-		contentPane.add(textField);
+		textFieldIp = new JTextField();
+		textFieldIp.setColumns(10);
+		textFieldIp.setBounds(172, 80, 300, 19);
+		contentPane.add(textFieldIp);
 
 		JButton button = new JButton("Enviar");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				int port=Integer.parseInt(textFieldIp.getText());
+				
+				cliente=new Cliente(textFieldIp.getText(),port);
 				
 				cliente.start();
 			}
@@ -86,10 +89,10 @@ public class TelaInicial extends JFrame implements Serializable {
 		button.setBounds(25, 255, 117, 25);
 		contentPane.add(button);
 
-		textField_1 = new JTextField();
-		textField_1.setColumns(10);
-		textField_1.setBounds(172, 111, 300, 19);
-		contentPane.add(textField_1);
+		textFieldPort = new JTextField();
+		textFieldPort.setColumns(10);
+		textFieldPort.setBounds(172, 111, 300, 19);
+		contentPane.add(textFieldPort);
 
 		JButton btnNewButton = new JButton("Escolher Arquivo");
 		btnNewButton.addActionListener(new ActionListener() {
@@ -97,13 +100,15 @@ public class TelaInicial extends JFrame implements Serializable {
 				JFileChooser fc = new JFileChooser();
 
 				int abrir = fc.showOpenDialog(null);
+				
 				if (abrir == JFileChooser.APPROVE_OPTION) {
 					path = fc.getSelectedFile().getAbsolutePath();
 					file = new File(path);
 					nomeArquivo = file.getName();
 					lblNomeDoArquivo.setText("Nome do Arquivo: " + nomeArquivo);
-					lblTamanhoDoArquivo
-							.setText("Tamanho do Arquivo: " + fc.getSelectedFile().getTotalSpace() / 1000000 + " MB");
+					lblTamanhoDoArquivo.setText("Tamanho do Arquivo: " + file.length() / 1000000 + " MB");
+					
+					
 				}
 
 			}
@@ -173,9 +178,10 @@ public class TelaInicial extends JFrame implements Serializable {
 		button_4 = new JButton("Cancelar");
 		button_4.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JDialog dialog=new JDialog();
+				JDialog dialog = new JDialog();
 				dialog.setTitle("Transferência cancelada");
-				dialog.setVisible(true);;
+				dialog.setVisible(true);
+				;
 			}
 		});
 		button_4.setBounds(48, 359, 117, 25);
