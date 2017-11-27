@@ -42,7 +42,7 @@ public class Cliente implements Runnable {
 		
 
 		try {
-			System.out.println("Conectando-se: " + porta);
+			System.out.println("Conectando-se na porta: " + porta+" IP: "+ip);
 			socket = new Socket(ip, porta);
 			inputStream = socket.getInputStream();
 			outputStream = socket.getOutputStream();
@@ -55,13 +55,13 @@ public class Cliente implements Runnable {
 				String endIP=socket.getLocalSocketAddress().toString();
 				outputStream.write(endIP.getBytes("UTF_16"));
 				outputStream.flush();				
-				
+				inputStream.read();
 				
 				System.out.println("Cliente enviando nome do arquivo.");
 				//Enviando nome do arquivo
 				outputStream.write(nomeArq.getBytes("UTF_16"));
 				outputStream.flush();
-				
+				inputStream.read();
 				
 				File file=new File(path);
 				tamArq=file.length();
@@ -73,6 +73,7 @@ public class Cliente implements Runnable {
 				bufferTam.putLong(tamArq);
 				outputStream.write(bufferTam.array(), 0, Long.BYTES);
 				outputStream.flush();
+				inputStream.read();
 				
 				fileOutputStream=new FileOutputStream(file);
 				
