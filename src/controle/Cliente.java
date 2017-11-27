@@ -30,6 +30,7 @@ public class Cliente implements Runnable {
 	public void run() {
 		
 		Socket socket = null;
+
 		FileOutputStream fileOutputStream = null;
 		InputStream inputStream = null;
 		OutputStream outputStream = null;
@@ -41,7 +42,7 @@ public class Cliente implements Runnable {
 		
 
 		try {
-			System.out.println("Conectando-se na porta: " + porta+" IP: "+ip);
+			System.out.println("Conectando-se na porta: " + porta+" e IP: "+ip);
 			socket = new Socket(ip, porta);
 			inputStream = socket.getInputStream();
 			outputStream = socket.getOutputStream();

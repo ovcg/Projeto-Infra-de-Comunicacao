@@ -37,7 +37,6 @@ public class TelaInicial extends JFrame {
 	private JButton buttonRecomecar;
 	private JButton buttonCancelar;
 	private JTextField textFieldRTTRec;
-	private JTextField textField;
 	private JTextField textFieldRTTEnv;
 	private JTextField textFieldTempoEnv;
 	private JTextField textFieldTempoRec;
@@ -118,7 +117,7 @@ public class TelaInicial extends JFrame {
 		btnIniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String ip = textFieldIp.getText();
-				int porta = Integer.parseInt(textFieldIp.getText());
+				int porta = Integer.parseInt(textFieldPort.getText());
 				enviar = 1;
 				cliente = new Cliente(ip, porta, nomeArquivo, path, enviar);
 				Thread t = new Thread(cliente);
@@ -212,11 +211,6 @@ public class TelaInicial extends JFrame {
 		textFieldRTTRec.setBounds(474, 242, 114, 19);
 		contentPane.add(textFieldRTTRec);
 		textFieldRTTRec.setColumns(10);
-
-		textField = new JTextField();
-		textField.setBounds(474, 242, 114, 19);
-		contentPane.add(textField);
-		textField.setColumns(10);
 
 		textFieldRTTEnv = new JTextField();
 		textFieldRTTEnv.setColumns(10);
