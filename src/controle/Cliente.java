@@ -1,11 +1,13 @@
 package controle;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.ByteBuffer;
 
 public class Cliente implements Runnable {
 
@@ -29,14 +31,15 @@ public class Cliente implements Runnable {
 		
 		Socket socket = null;
 		FileInputStream fileInputStream = null;
-		FileOutputStream filOutputStream = null;
+		FileOutputStream fileOutputStream = null;
 		InputStream inputStream = null;
 		OutputStream outputStream = null;
 		
 		byte[] buffer= new byte[5000];
-		int byteRead = 0;
-		long tamArq = 0;
+		int bytesLidos = 0;
+		long tamArq = 0;  
 		long arqEnviado = 0;
+		
 
 		try {
 			System.out.println("Conectando-se: " + porta);
@@ -44,8 +47,48 @@ public class Cliente implements Runnable {
 			inputStream = socket.getInputStream();
 			outputStream = socket.getOutputStream();
 			
+			inputStream.read();
 			
+			if(enviar==1) {
+				System.out.println("Cliente enviando endereço IP.");
+				//Enviando endereço IP
+				String endIP=socket.getLocalSocketAddress().toString();
+				outputStream.write(endIP.getBytes("UTF_16"));
+				outputStream.flush();				
+				
+				
+				System.out.println("Cliente enviando nome do arquivo.");
+				//Enviando nome do arquivo
+				outputStream.write(nomeArq.getBytes("UTF_16"));
+				outputStream.flush();
+				
+				
+				File file=new File(path);
+				tamArq=file.length();
+						
+				System.out.println("Cliente enviando tamanho do arquivo: " + tamArq);
+
+				// Envia tamanho do arquivo
+				ByteBuffer bufferTam = ByteBuffer.allocate(Long.BYTES);
+				bufferTam.putLong(tamArq);
+				outputStream.write(bufferTam.array(), 0, Long.BYTES);
+				outputStream.flush();
+				
+				fileOutputStream=new FileOutputStream(file);
+				
+				while((bytesLidos=fileInputStream.read(buffer))!=-1) {//Enviando arquivo
+					
+					fileOutputStream.write(buffer, 0, bytesLidos);
+					fileOutputStream.flush();
+					arqEnviado+=bytesLidos;					
+				}
+				
+				outputStream.close();
+			}
 			
+			fileInputStream.close();
+			fileOutputStream.close();
+			socket.close();
 
 		} catch (IOException e1) {
 			e1.printStackTrace();
