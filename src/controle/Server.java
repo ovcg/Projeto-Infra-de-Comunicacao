@@ -44,7 +44,7 @@ public class Server implements Runnable {
 		long arqRecebido = 0;//variavel para calcular a porcentagem na progressbar
 
 		try {
-			System.out.println("Escutando na porta 5000");
+			System.out.println("Escutando na porta: "+server.getLocalPort());
 			Socket socket = server.accept();
 
 			input = socket.getInputStream();
