@@ -30,7 +30,6 @@ public class Cliente implements Runnable {
 	public void run() {
 		
 		Socket socket = null;
-		FileInputStream fileInputStream = null;
 		FileOutputStream fileOutputStream = null;
 		InputStream inputStream = null;
 		OutputStream outputStream = null;
@@ -77,7 +76,7 @@ public class Cliente implements Runnable {
 				
 				fileOutputStream=new FileOutputStream(file);
 				
-				while((bytesLidos=fileInputStream.read(buffer))!=-1) {//Enviando arquivo
+				while((bytesLidos=inputStream.read(buffer))!=-1) {//Enviando arquivo
 					
 					fileOutputStream.write(buffer, 0, bytesLidos);
 					fileOutputStream.flush();
@@ -87,7 +86,7 @@ public class Cliente implements Runnable {
 				outputStream.close();
 			}
 			
-			fileInputStream.close();
+			
 			fileOutputStream.close();
 			socket.close();
 
