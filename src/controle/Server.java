@@ -60,7 +60,7 @@ public class Server implements Runnable {
 			output.write(prosseguir);
 
 			File arquivo = new File("Arquivos" + File.separator + nome);
-			fileInput = new FileInputStream(arquivo);
+			fileOutput = new FileOutputStream(arquivo);
 
 			// Recebendo tamanho do arquivo
 			byte[] aux = new byte[Long.BYTES];

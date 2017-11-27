@@ -57,14 +57,17 @@ public class Cliente implements Runnable {
 				outputStream.flush();				
 				inputStream.read();
 				
+								
+				File file=new File(path);
+				tamArq=file.length();
+				nomeArq=file.getName();
+				
 				System.out.println("Cliente enviando nome do arquivo.");
 				//Enviando nome do arquivo
 				outputStream.write(nomeArq.getBytes("UTF_16"));
 				outputStream.flush();
 				inputStream.read();
-				
-				File file=new File(path);
-				tamArq=file.length();
+
 						
 				System.out.println("Cliente enviando tamanho do arquivo: " + tamArq);
 
