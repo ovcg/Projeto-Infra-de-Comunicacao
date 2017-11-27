@@ -48,6 +48,7 @@ public class Server implements Runnable {
 			Socket socket = server.accept();
 
 			input = socket.getInputStream();
+			output=socket.getOutputStream();
 			output.write(prosseguir);
 
 			// Nome do arquivo
