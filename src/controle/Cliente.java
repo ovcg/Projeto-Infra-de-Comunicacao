@@ -10,6 +10,8 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 
+import javax.swing.JProgressBar;
+
 public class Cliente implements Runnable {
 
 	private String ip;
@@ -17,13 +19,15 @@ public class Cliente implements Runnable {
 	private String nomeArq;
 	private String path;
 	private int enviar;
+	private JProgressBar progressbar;
 
-	public Cliente(String ip, int porta, String nomeArq, String path, int enviar) {
+	public Cliente(String ip, int porta, String nomeArq, String path, int enviar,JProgressBar progress ) {
 		this.ip = ip;
 		this.porta = porta;
 		this.nomeArq = nomeArq;
 		this.path = path;
 		this.enviar = enviar;
+		this.progressbar=progress;
 
 	}
 
@@ -58,7 +62,7 @@ public class Cliente implements Runnable {
 				nomeArq=file.getName();
 				
 				System.out.println("Caminho: "+path);
-				System.out.println("Cliente enviando nome do arquivo."+nomeArq);
+				System.out.println("Cliente enviando nome do arquivo:"+nomeArq);
 				//Enviando nome do arquivo
 				outputStream.write(nomeArq.getBytes("UTF_16"));
 				
@@ -70,8 +74,7 @@ public class Cliente implements Runnable {
 				// Envia tamanho do arquivo
 				ByteBuffer bufferTam = ByteBuffer.allocate(Long.BYTES);
 				bufferTam.putLong(tamArq);
-				outputStream.write(bufferTam.array(), 0, Long.BYTES);
-			
+				outputStream.write(bufferTam.array(), 0, Long.BYTES);			
 				
 				
 				fileInput=new FileInputStream(file);
@@ -81,7 +84,14 @@ public class Cliente implements Runnable {
 					
 					out.write(buffer, 0, bytesLidos);
 					out.flush();
-					arqEnviado+=bytesLidos;					
+					arqEnviado+=bytesLidos;		
+					
+					// Atualizando ProgessBar
+					progressbar.setValue((int) ((arqEnviado * 100) / tamArq));
+					progressbar.setString(Long.toString(((arqEnviado * 100) / tamArq)) + " %");
+					progressbar.setStringPainted(true);
+					
+					
 				}
 				inputStream.close();
 				outputStream.close();

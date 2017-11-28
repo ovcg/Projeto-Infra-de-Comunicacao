@@ -17,10 +17,10 @@ import javax.swing.JProgressBar;
 public class Server implements Runnable {
 
 	private ServerSocket server;
-	private JProgressBar barraStatus;
+	private JProgressBar progressBar;
 
-	public Server(JProgressBar barraStatus) {
-		this.barraStatus = barraStatus;
+	public Server(JProgressBar progressBar) {
+		this.progressBar = progressBar;
 	}
 
 	public ServerSocket getServer() {
@@ -83,6 +83,11 @@ public class Server implements Runnable {
 				fileOutput.flush();
 				
 				arqRecebido+=bytesLidos;
+				
+				// Atualizando ProgessBar
+				progressBar.setValue((int) ((arqRecebido * 100) / tamArq));
+				progressBar.setString(Long.toString((arqRecebido * 100) / tamArq) + " %");
+				progressBar.setStringPainted(true);
 
 			}
 			fileOutput.close();

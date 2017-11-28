@@ -42,7 +42,7 @@ public class TelaInicial extends JFrame {
 	private JTextField textFieldTempoRec;
 	private JLabel lblIp;
 	private JProgressBar progressBarRecebendo;
-	
+	private JProgressBar progressBar;
 	
 	private Server server;
 	private Cliente cliente;
@@ -87,7 +87,7 @@ public class TelaInicial extends JFrame {
 
 		JFileChooser fc = new JFileChooser();
 		ServerSocket serverDefault = new ServerSocket(5000);// porta default para receber arquivos
-		Server server = new Server(progressBarRecebendo);
+		server = new Server(progressBarRecebendo);
 		server.setServer(serverDefault);
 
 		Thread serverThread = new Thread(server);
@@ -119,7 +119,7 @@ public class TelaInicial extends JFrame {
 				String ip = textFieldIp.getText();
 				int porta = Integer.parseInt(textFieldPort.getText());
 				enviar = 1;
-				cliente = new Cliente(ip, porta, nomeArquivo, path, enviar);
+				cliente = new Cliente(ip, porta, nomeArquivo, path, enviar,progressBar);
 				Thread t = new Thread(cliente);
 				t.start();
 
@@ -153,7 +153,7 @@ public class TelaInicial extends JFrame {
 		lblEnviando.setBounds(49, 170, 108, 15);
 		contentPane.add(lblEnviando);
 
-		JProgressBar progressBar = new JProgressBar();
+		progressBar = new JProgressBar();
 		progressBar.setStringPainted(true);
 		progressBar.setBounds(163, 160, 234, 25);
 		contentPane.add(progressBar);
