@@ -61,11 +61,10 @@ public class Cliente implements Runnable {
 				tamArq=file.length();
 				nomeArq=file.getName();
 				
-				System.out.println("Caminho: "+path);
 				System.out.println("Cliente enviando nome do arquivo:"+nomeArq);
 				//Enviando nome do arquivo
 				outputStream.write(nomeArq.getBytes("UTF_16"));
-				
+				inputStream.read();
 				
 
 				int mega=1000000;		
@@ -75,6 +74,7 @@ public class Cliente implements Runnable {
 				ByteBuffer bufferTam = ByteBuffer.allocate(Long.BYTES);
 				bufferTam.putLong(tamArq);
 				outputStream.write(bufferTam.array(), 0, Long.BYTES);			
+				inputStream.read();
 				
 				
 				fileInput=new FileInputStream(file);
@@ -85,6 +85,7 @@ public class Cliente implements Runnable {
 					out.write(buffer, 0, bytesLidos);
 					out.flush();
 					arqEnviado+=bytesLidos;		
+					
 					
 					// Atualizando ProgessBar
 					progressbar.setValue((int) ((arqEnviado * 100) / tamArq));

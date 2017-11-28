@@ -44,6 +44,7 @@ public class TelaInicial extends JFrame {
 	private JProgressBar progressBarRecebendo;
 	private JProgressBar progressBar;
 	
+	private ServerSocket serverDefault;
 	private Server server;
 	private Cliente cliente;
 	private String path;
@@ -86,12 +87,7 @@ public class TelaInicial extends JFrame {
 		contentPane.add(textFieldIp);
 
 		JFileChooser fc = new JFileChooser();
-		ServerSocket serverDefault = new ServerSocket(5000);// porta default para receber arquivos
-		server = new Server(progressBarRecebendo);
-		server.setServer(serverDefault);
-
-		Thread serverThread = new Thread(server);
-		serverThread.start();
+		
 
 		JButton btnNewButton = new JButton("Escolher Arquivo");
 		btnNewButton.addActionListener(new ActionListener() {
@@ -128,6 +124,13 @@ public class TelaInicial extends JFrame {
 		btnIniciar.setBounds(48, 346, 117, 25);
 		contentPane.add(btnIniciar);
 
+		serverDefault = new ServerSocket(5001);// porta default para receber arquivos
+		server = new Server(progressBarRecebendo);
+		server.setServer(serverDefault);
+
+		Thread serverThread = new Thread(server);
+		serverThread.start();
+		
 		textFieldPort = new JTextField();
 		textFieldPort.setColumns(10);
 		textFieldPort.setBounds(322, 12, 75, 19);
