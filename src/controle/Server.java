@@ -1,5 +1,6 @@
 package controle;
 
+import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -34,8 +35,9 @@ public class Server implements Runnable {
 	public void run() {
 		InputStream input = null;
 		OutputStream output = null;
-		FileInputStream fileInput = null;
+		DataInputStream data=null;
 		FileOutputStream fileOutput = null;
+		
 
 		byte prosseguir = 1;//sinal para continuar a receber os dados
 		byte[] buffer = new byte[5000];//tam do pacote
@@ -59,20 +61,23 @@ public class Server implements Runnable {
 			System.out.println("Recebendo arquivo: " + nome);
 			output.write(prosseguir);
 
-			File arquivo = new File("Arquivos" + File.separator + nome);
-			fileOutput = new FileOutputStream(arquivo);
+			
 
 			// Recebendo tamanho do arquivo
 			byte[] aux = new byte[Long.BYTES];
 			input.read(aux);
 			ByteBuffer bufferTam = ByteBuffer.wrap(aux);
 			tamArq = bufferTam.getLong();
-
-			System.out.println("Recebendo tamanho do arquivo: " + tamArq);
-
 			output.write(prosseguir);
+			
+			
+			System.out.println("Recebendo tamanho do arquivo: " + tamArq/1000000+" MB");
 
-			while ((bytesLidos = input.read(buffer)) != -1) {// Recebendo o arquivo
+			File arquivo = new File("novo.txt");
+			fileOutput = new FileOutputStream(arquivo);
+			data=new DataInputStream(input); 
+
+			while ((bytesLidos = data.read(buffer)) >0) {// Recebendo o arquivo
 				
 				fileOutput.write(buffer, 0, bytesLidos);
 				fileOutput.flush();
