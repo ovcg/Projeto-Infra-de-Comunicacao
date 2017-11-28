@@ -1,5 +1,7 @@
 package controle;
 
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -30,16 +32,10 @@ public class Cliente implements Runnable {
 	public void run() {
 		
 		Socket socket = null;
-
-		FileOutputStream fileOutputStream = null;
+		FileInputStream fileInput=null;
 		InputStream inputStream = null;
 		OutputStream outputStream = null;
-		
-		byte[] buffer= new byte[5000];
-		int bytesLidos = 0;
-		long tamArq = 0;  
-		long arqEnviado = 0;
-		
+		DataOutputStream out=null;
 
 		try {
 			System.out.println("Conectando-se na porta: " + porta+" e IP: "+ip);
@@ -48,50 +44,51 @@ public class Cliente implements Runnable {
 			outputStream = socket.getOutputStream();
 			
 			inputStream.read();
+
+			byte[] buffer= new byte[5000];
+			int bytesLidos = 0;
+			long tamArq = 0;  
+			long arqEnviado = 0;
+			
 			
 			if(enviar==1) {
-				System.out.println("Cliente enviando endereço IP.");
-				//Enviando endereço IP
-				String endIP=socket.getLocalSocketAddress().toString();
-				outputStream.write(endIP.getBytes("UTF_16"));
-				outputStream.flush();				
-				inputStream.read();
-				
+							
 								
 				File file=new File(path);
 				tamArq=file.length();
 				nomeArq=file.getName();
 				
-				System.out.println("Cliente enviando nome do arquivo.");
+				System.out.println("Caminho: "+path);
+				System.out.println("Cliente enviando nome do arquivo."+nomeArq);
 				//Enviando nome do arquivo
 				outputStream.write(nomeArq.getBytes("UTF_16"));
-				outputStream.flush();
-				inputStream.read();
+				
+				
 
-						
-				System.out.println("Cliente enviando tamanho do arquivo: " + tamArq);
+				int mega=1000000;		
+				System.out.println("Cliente enviando tamanho do arquivo: " + tamArq/mega+" MB");
 
 				// Envia tamanho do arquivo
 				ByteBuffer bufferTam = ByteBuffer.allocate(Long.BYTES);
 				bufferTam.putLong(tamArq);
 				outputStream.write(bufferTam.array(), 0, Long.BYTES);
-				outputStream.flush();
-				inputStream.read();
+			
 				
-				fileOutputStream=new FileOutputStream(file);
 				
-				while((bytesLidos=inputStream.read(buffer))!=-1) {//Enviando arquivo
+				fileInput=new FileInputStream(file);
+				out=new DataOutputStream(outputStream);
+				
+				while((bytesLidos=fileInput.read(buffer))>0) {//Enviando arquivo
 					
-					fileOutputStream.write(buffer, 0, bytesLidos);
-					fileOutputStream.flush();
+					out.write(buffer, 0, bytesLidos);
+					out.flush();
 					arqEnviado+=bytesLidos;					
 				}
-				
+				inputStream.close();
 				outputStream.close();
 			}
 			
-			
-			fileOutputStream.close();
+			fileInput.close();
 			socket.close();
 
 		} catch (IOException e1) {
