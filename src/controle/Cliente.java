@@ -94,10 +94,11 @@ public class Cliente implements Runnable {
 					
 					
 				}
-				inputStream.close();
-				outputStream.close();
+				
 				
 			}
+			inputStream.close();
+			outputStream.close();
 			out.close();
 			fileInput.close();
 			socket.close();
