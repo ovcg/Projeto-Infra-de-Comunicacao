@@ -85,6 +85,11 @@ public class TelaInicial extends JFrame {
 		textFieldIp.setColumns(10);
 		textFieldIp.setBounds(100, 12, 117, 19);
 		contentPane.add(textFieldIp);
+		
+		progressBar = new JProgressBar();
+		progressBar.setStringPainted(true);
+		progressBar.setBounds(163, 160, 234, 25);
+		contentPane.add(progressBar);
 
 		JFileChooser fc = new JFileChooser();
 		
@@ -123,7 +128,12 @@ public class TelaInicial extends JFrame {
 		});
 		btnIniciar.setBounds(48, 346, 117, 25);
 		contentPane.add(btnIniciar);
-
+		
+		progressBarRecebendo = new JProgressBar();
+		progressBarRecebendo.setStringPainted(true);
+		progressBarRecebendo.setBounds(163, 243, 234, 25);
+		contentPane.add(progressBarRecebendo);
+		
 		serverDefault = new ServerSocket(5001);// porta default para receber arquivos
 		server = new Server(progressBarRecebendo);
 		server.setServer(serverDefault);
@@ -156,10 +166,6 @@ public class TelaInicial extends JFrame {
 		lblEnviando.setBounds(49, 170, 108, 15);
 		contentPane.add(lblEnviando);
 
-		progressBar = new JProgressBar();
-		progressBar.setStringPainted(true);
-		progressBar.setBounds(163, 160, 234, 25);
-		contentPane.add(progressBar);
 
 		JLabel label_3 = new JLabel("RTT:");
 		label_3.setBounds(413, 165, 70, 15);
@@ -197,10 +203,7 @@ public class TelaInicial extends JFrame {
 		lblRecebendo.setBounds(48, 244, 108, 15);
 		contentPane.add(lblRecebendo);
 
-		progressBarRecebendo = new JProgressBar();
-		progressBarRecebendo.setStringPainted(true);
-		progressBarRecebendo.setBounds(163, 243, 234, 25);
-		contentPane.add(progressBarRecebendo);
+		
 
 		JLabel label_1 = new JLabel("RTT:");
 		label_1.setBounds(413, 248, 70, 15);

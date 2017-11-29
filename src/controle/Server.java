@@ -58,6 +58,11 @@ public class Server implements Runnable {
 			input.read(nomeArq);
 
 			String nome = new String(nomeArq, StandardCharsets.UTF_16);
+			
+			int position=nome.indexOf(0);
+			if(position!=-1) {
+				nome=nome.substring(0,position);
+			}
 			System.out.println("Recebendo arquivo: " + nome);
 			output.write(prosseguir);
 
@@ -70,10 +75,9 @@ public class Server implements Runnable {
 			tamArq = bufferTam.getLong();
 			output.write(prosseguir);
 			
-			
 			System.out.println("Recebendo tamanho do arquivo: " + tamArq/1000000+" MB");
 
-			File arquivo = new File("novo.txt");
+			File arquivo = new File("Recebidos"+File.separator+nome);
 			fileOutput = new FileOutputStream(arquivo);
 			data=new DataInputStream(input); 
 
@@ -85,10 +89,11 @@ public class Server implements Runnable {
 				arqRecebido+=bytesLidos;
 				
 				// Atualizando ProgessBar
-				progressBar.setValue((int) ((arqRecebido * 100) / tamArq));
+				
+				progressBar.setValue((int)((arqRecebido * 100) / tamArq));
 				progressBar.setString(Long.toString((arqRecebido * 100) / tamArq) + " %");
 				progressBar.setStringPainted(true);
-
+				
 			}
 			fileOutput.close();
 			socket.close();
