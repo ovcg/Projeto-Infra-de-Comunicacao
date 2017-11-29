@@ -45,7 +45,7 @@ public class TelaInicial extends JFrame {
 	private JProgressBar progressBar;
 	
 	private ServerSocket serverDefault;
-	private Server server;
+	private static Server server;
 	private Cliente cliente;
 	private String path;
 	private String nomeArquivo;
@@ -61,6 +61,8 @@ public class TelaInicial extends JFrame {
 				try {
 					TelaInicial frame = new TelaInicial();
 					frame.setVisible(true);
+					Thread serverThread = new Thread(server);
+					serverThread.start();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -138,8 +140,7 @@ public class TelaInicial extends JFrame {
 		server = new Server(progressBarRecebendo);
 		server.setServer(serverDefault);
 
-		Thread serverThread = new Thread(server);
-		serverThread.start();
+		
 		
 		textFieldPort = new JTextField();
 		textFieldPort.setColumns(10);
@@ -183,7 +184,7 @@ public class TelaInicial extends JFrame {
 		buttonParar.setBounds(202, 346, 117, 25);
 		contentPane.add(buttonParar);
 
-		buttonRecomecar = new JButton("Recomeçar");
+		buttonRecomecar = new JButton("Restart");
 		buttonRecomecar.setBounds(497, 346, 117, 25);
 		contentPane.add(buttonRecomecar);
 
@@ -249,4 +250,5 @@ public class TelaInicial extends JFrame {
 		lblIp.setBounds(413, 297, 201, 15);
 		contentPane.add(lblIp);
 	}
+	
 }
