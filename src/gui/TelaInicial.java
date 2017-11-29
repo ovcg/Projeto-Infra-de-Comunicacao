@@ -51,6 +51,7 @@ public class TelaInicial extends JFrame {
 	private String nomeArquivo;
 	private File file;
 	private int enviar = 0;
+	private static int portaDefault=5001;
 
 	/**
 	 * Launch the application.
@@ -136,7 +137,7 @@ public class TelaInicial extends JFrame {
 		progressBarRecebendo.setBounds(163, 243, 234, 25);
 		contentPane.add(progressBarRecebendo);
 		
-		serverDefault = new ServerSocket(5001);// porta default para receber arquivos
+		serverDefault = new ServerSocket(portaDefault);// porta default para receber arquivos
 		server = new Server(progressBarRecebendo);
 		server.setServer(serverDefault);
 

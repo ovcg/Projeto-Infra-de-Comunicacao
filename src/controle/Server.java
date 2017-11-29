@@ -65,7 +65,6 @@ public class Server implements Runnable {
 			}
 			System.out.println("Recebendo arquivo: " + nome);
 			output.write(prosseguir);
-
 			
 
 			// Recebendo tamanho do arquivo
@@ -95,6 +94,7 @@ public class Server implements Runnable {
 				progressBar.setStringPainted(true);
 				
 			}
+			data.close();
 			fileOutput.close();
 			socket.close();
 
