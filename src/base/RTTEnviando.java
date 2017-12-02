@@ -16,9 +16,9 @@ public class RTTEnviando implements Runnable {
 	private String ip;
 	private JTextField rttEnviando;
 
-	public RTTEnviando( String ip,JTextField rttEnviando) {
+	public RTTEnviando(String ip, JTextField rttEnviando) {
 		this.ip = ip;
-		this.rttEnviando=rttEnviando;
+		this.rttEnviando = rttEnviando;
 	}
 
 	public void setAuxThread(boolean aux) {
@@ -47,30 +47,34 @@ public class RTTEnviando implements Runnable {
 				outputStream.write(nome.getBytes());
 				outputStream.flush();
 
-				do {
-					if(buffer.ready()) {
-						if(buffer.readLine().equals("rtt1")) {
-							;
-							tempoRTT=System.currentTimeMillis()-tempoInicial;
-							
-						}
-					}
+				while (auxThread == false && !buffer.ready())
+					;
 
-				} while (auxThread == false && !buffer.ready());
-				
-				nome="rtt";
-				if(auxThread==true)break;
+				if (buffer.ready()) {
+					if (buffer.readLine().equals("rtt1")) {
+						;
+						tempoRTT = System.nanoTime() - tempoInicial;
+
+					}
+				}
+
+				nome = "rtt";
+				if (auxThread == true) {
+					break;
+				}
 				outputStream.write(nome.getBytes());
 				outputStream.flush();
-				
-				String rttAtual = "" + tempoRTT;
+
+				String rttAtual = "" + tempoRTT / 1000000;
 				rttEnviando.setText(rttAtual);
 
-				if (auxThread == true)
+				if (auxThread == true) {
 					break;
+				}
 				Thread.sleep(1000);
-				if (auxThread == true)
+				if (auxThread == true) {
 					break;
+				}
 
 			}
 

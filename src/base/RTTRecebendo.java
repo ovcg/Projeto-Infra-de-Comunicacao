@@ -44,37 +44,35 @@ public class RTTRecebendo implements Runnable {
 
 			while (true) {
 
-				do {
+				while (auxThread == false && !buffer.ready())
 					if (buffer.ready()) {
 						buffer.readLine();
 						tempoInicial = System.currentTimeMillis();
 					}
-					if (auxThread == true) {
-						break;
+				if (auxThread == true) {
+					break;
+				}
+				outputStream.write(nome.getBytes());
+				outputStream.flush();
+
+				while (auxThread == false && !buffer.ready())
+					;
+				if (buffer.ready()) {
+					if (buffer.readLine().equals("rtt")) {
+						tempoRTT = System.currentTimeMillis() - tempoInicial;
 					}
-					outputStream.write(nome.getBytes());
-					outputStream.flush();
 				}
 
-				while (auxThread == false && !buffer.ready());
-
-				do {
-					if (buffer.ready()) {
-						if (buffer.readLine().equals("rtt")) {
-							tempoRTT = System.currentTimeMillis() - tempoInicial;
-						}
-					}
-
-				} while (auxThread == false && !buffer.ready());
-
-				String rttAtual = "" + tempoRTT;
+				String rttAtual = "" + tempoRTT / 1000000;
 				rttRec.setText(rttAtual);
 
-				if (auxThread == true)
+				if (auxThread == true) {
 					break;
+				}
 				Thread.sleep(1000);
-				if (auxThread == true)
+				if (auxThread == true) {
 					break;
+				}
 
 			}
 
