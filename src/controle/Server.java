@@ -2,7 +2,6 @@ package controle;
 
 import java.io.DataInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,25 +10,30 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.text.DecimalFormat;
 
 import javax.swing.JProgressBar;
+import javax.swing.JTextField;
+
+import base.RTTRecebendo;
 
 public class Server implements Runnable {
 
+	private int porta;
 	private ServerSocket server;
 	private JProgressBar progressBar;
+	private JTextField rttRec;
+	private JTextField tempoEstimado;
+	
 
-	public Server(JProgressBar progressBar) {
+	public Server(int porta,JProgressBar progressBar,JTextField rttRec, JTextField tempoEstimado) {
+		this.porta=porta;
 		this.progressBar = progressBar;
+		this.rttRec=rttRec;
+		this.tempoEstimado=tempoEstimado;
+		
 	}
 
-	public ServerSocket getServer() {
-		return server;
-	}
-
-	public void setServer(ServerSocket server) {
-		this.server = server;
-	}
 
 	@Override
 	public void run() {
@@ -44,14 +48,27 @@ public class Server implements Runnable {
 		int bytesLidos = 0;//bytes lidos 
 		long tamArq = 0;//recebe tam do arquivo
 		long arqRecebido = 0;//variavel para calcular a porcentagem na progressbar
-
+		long tempoInicial=0;
+		long atualizaTempo=0;
+		long duracao=0;
+		double vel=0;
+		double tempoRestante=0;
+		
+		
 		try {
-			System.out.println("Escutando na porta: "+server.getLocalPort());
+			server=new ServerSocket(porta);
+			System.out.println("Escutando na porta: "+server.getLocalPort());	
 			Socket socket = server.accept();
 
 			input = socket.getInputStream();
 			output=socket.getOutputStream();
 			output.write(prosseguir);
+
+			RTTRecebendo rtt=new RTTRecebendo(rttRec);
+			Thread t=new Thread(rtt);
+			t.start();
+			rtt.setAuxThread(false);
+			
 
 			// Nome do arquivo
 			byte[] nomeArq = new byte[150];
@@ -65,6 +82,9 @@ public class Server implements Runnable {
 			}
 			System.out.println("Recebendo arquivo: " + nome);
 			output.write(prosseguir);
+			
+			tempoInicial=System.currentTimeMillis();
+			atualizaTempo=tempoInicial;
 			
 
 			// Recebendo tamanho do arquivo
@@ -93,10 +113,25 @@ public class Server implements Runnable {
 				progressBar.setString(Long.toString((arqRecebido * 100) / tamArq) + " %");
 				progressBar.setStringPainted(true);
 				
+				if(arqRecebido>10000 && (System.currentTimeMillis()-atualizaTempo)>1000) {
+					
+					duracao = System.currentTimeMillis() - tempoInicial;
+					long div = arqRecebido / duracao;
+					vel = div * 1000;
+					tempoRestante = (tamArq - arqRecebido) / vel;
+					DecimalFormat dec = new DecimalFormat("#");
+					String auxDec = "" + dec.format(tempoRestante);
+					tempoEstimado.setText(auxDec);
+					atualizaTempo = System.currentTimeMillis();
+				}
+				
 			}
-			data.close();
+			
+			
 			fileOutput.close();
+			data.close();
 			socket.close();
+			server.close();
 
 		} catch (IOException e) {
 
