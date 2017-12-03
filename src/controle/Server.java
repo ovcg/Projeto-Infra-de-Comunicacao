@@ -79,13 +79,14 @@ public class Server implements Runnable {
 			if (pos != -1) {
 				ipRecebido = ipRecebido.substring(0, pos);
 			}
-			lblIp.setText("IP recebido: "+ipRecebido);//
+			lblIp.setText("IP recebido: "+ipRecebido);//Colocando ip recebido na gui
 			
 			// Nome do arquivo
 			byte[] nomeArq = new byte[150];
 			input.read(nomeArq);
 
 			String nome = new String(nomeArq, StandardCharsets.UTF_16);
+			output.write(prosseguir);
 
 			int position = nome.indexOf(0);
 			if (position != -1) {

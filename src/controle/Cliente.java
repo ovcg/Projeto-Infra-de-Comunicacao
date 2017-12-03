@@ -6,7 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.InetAddress;
+import java.net.Inet4Address;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
@@ -98,7 +98,7 @@ public class Cliente implements Runnable {
 
 				System.out.println("Cliente enviando endereço IP:" + nomeArq);
 				// Enviando ip
-				outputStream.write(InetAddress.getLocalHost().getHostAddress().getBytes("UTF_16"));
+				outputStream.write(Inet4Address.getLocalHost().getHostAddress().getBytes("UTF_16"));
 				inputStream.read();
 				
 				System.out.println("Cliente enviando nome do arquivo:" + nomeArq);
