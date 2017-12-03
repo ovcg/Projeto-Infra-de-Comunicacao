@@ -44,7 +44,7 @@ public class Server implements Runnable {
 		DataInputStream data = null;
 		FileOutputStream fileOutput = null;
 
-		//byte prosseguir = 1;// sinal para continuar a receber os dados
+		byte prosseguir = 1;// sinal para continuar a receber os dados
 		byte[] buffer = new byte[5000];// tam do pacote
 		int bytesLidos = 0;// bytes lidos
 		long tamArq = 0;// recebe tam do arquivo
@@ -62,7 +62,7 @@ public class Server implements Runnable {
 
 			input = socket.getInputStream();
 			output = socket.getOutputStream();
-			//output.write(prosseguir);
+			output.write(prosseguir);
 
 			RTTRecebendo rtt = new RTTRecebendo(rttRec);
 			Thread t = new Thread(rtt);
@@ -92,7 +92,7 @@ public class Server implements Runnable {
 				nome = nome.substring(0, position);
 			}
 			System.out.println("Recebendo arquivo: " + nome);
-			//output.write(prosseguir);
+			output.write(prosseguir);
 
 			tempoInicial = System.currentTimeMillis();
 			atualizaTempo = tempoInicial;
@@ -102,7 +102,7 @@ public class Server implements Runnable {
 			input.read(aux);
 			ByteBuffer bufferTam = ByteBuffer.wrap(aux);
 			tamArq = bufferTam.getLong();
-			//output.write(prosseguir);
+			output.write(prosseguir);
 
 			System.out.println("Recebendo tamanho do arquivo: " + tamArq / 1000000 + " MB");
 
