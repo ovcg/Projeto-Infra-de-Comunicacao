@@ -47,7 +47,7 @@ public class RTTRecebendo implements Runnable {
 				while (auxThread == false && !buffer.ready())
 					if (buffer.ready()) {
 						buffer.readLine();
-						tempoInicial = System.currentTimeMillis();
+						tempoInicial = System.nanoTime();
 					}
 				if (auxThread == true) {
 					break;
@@ -59,7 +59,7 @@ public class RTTRecebendo implements Runnable {
 					;
 				if (buffer.ready()) {
 					if (buffer.readLine().equals("rtt")) {
-						tempoRTT = System.currentTimeMillis() - tempoInicial;
+						tempoRTT = System.nanoTime() - tempoInicial;
 					}
 				}
 

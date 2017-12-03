@@ -43,7 +43,7 @@ public class RTTEnviando implements Runnable {
 
 			while (true) {
 
-				tempoInicial = System.currentTimeMillis();
+				tempoInicial = System.nanoTime();
 				outputStream.write(nome.getBytes());
 				outputStream.flush();
 
@@ -52,7 +52,6 @@ public class RTTEnviando implements Runnable {
 
 				if (buffer.ready()) {
 					if (buffer.readLine().equals("rtt1")) {
-						;
 						tempoRTT = System.nanoTime() - tempoInicial;
 
 					}

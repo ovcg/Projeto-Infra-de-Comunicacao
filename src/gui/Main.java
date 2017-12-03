@@ -121,13 +121,13 @@ public class Main extends JFrame {
 		textFieldTempoRec.setBounds(176, 295, 114, 19);
 		contentPane.add(textFieldTempoRec);
 
-		JLabel lblMs = new JLabel("ms");
+		JLabel lblMs = new JLabel("segundos");
 		lblMs.setBounds(327, 197, 70, 15);
 		contentPane.add(lblMs);
 
-		JLabel label = new JLabel("ms");
-		label.setBounds(295, 299, 70, 15);
-		contentPane.add(label);
+		JLabel lblSegundos = new JLabel("segundos");
+		lblSegundos.setBounds(295, 299, 70, 15);
+		contentPane.add(lblSegundos);
 		progressBarRecebendo = new JProgressBar();
 		progressBarRecebendo.setStringPainted(true);
 		progressBarRecebendo.setBounds(163, 243, 234, 25);
