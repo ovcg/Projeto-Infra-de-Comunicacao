@@ -7,18 +7,18 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 //Classe para calcular o RTT
 public class RTTEnviando implements Runnable {
 
 	private boolean auxThread;
 	private String ip;
-	private JTextField rttEnviando;
+	private JTextPane rttEnviando;
 
-	public RTTEnviando(String ip, JTextField rttEnviando) {
+	public RTTEnviando(String ip, JTextPane rttEnv) {
 		this.ip = ip;
-		this.rttEnviando = rttEnviando;
+		this.rttEnviando = rttEnv;
 	}
 
 	public void setAuxThread(boolean aux) {

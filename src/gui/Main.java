@@ -8,6 +8,7 @@ import controle.Cliente;
 import controle.Server;
 
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.JButton;
 import javax.swing.JFileChooser;
 import java.awt.event.ActionListener;
@@ -31,16 +32,18 @@ public class Main extends JFrame {
 	private JLabel lblEndereoDestino;
 	private JLabel lblPortaDestino;
 	private JLabel lblTamanhoDoArquivo;
+	private JLabel lblIp;
 	private JButton buttonParar;
 	private JButton buttonReiniciar;
 	private JButton buttonCancelar;
-	private JTextField textFieldRTTRec;
-	private JTextField textFieldRTTEnv;
+	private JTextPane textPaneRTTRec;
+	private JTextPane textPaneRTTEnv;
 	private JTextField textFieldTempoEnv;
 	private JTextField textFieldTempoRec;
 	private JProgressBar progressBarRecebendo;
-	private JProgressBar progressBar;
-
+	private JProgressBar progressBar;	
+	private Cliente cliente;
+	private Server server;
 	private String path;
 	private String nomeArquivo;
 	private File file;
@@ -99,15 +102,13 @@ public class Main extends JFrame {
 		lblTempoEstimado_1.setBounds(48, 297, 124, 15);
 		contentPane.add(lblTempoEstimado_1);
 
-		textFieldRTTRec = new JTextField();
-		textFieldRTTRec.setBounds(454, 244, 114, 19);
-		contentPane.add(textFieldRTTRec);
-		textFieldRTTRec.setColumns(10);
+		textPaneRTTRec = new JTextPane();
+		textPaneRTTRec.setBounds(454, 244, 114, 19);
+		contentPane.add(textPaneRTTRec);
 
-		textFieldRTTEnv = new JTextField();
-		textFieldRTTEnv.setColumns(10);
-		textFieldRTTEnv.setBounds(454, 163, 114, 19);
-		contentPane.add(textFieldRTTEnv);
+		textPaneRTTEnv = new JTextPane();
+		textPaneRTTEnv.setBounds(454, 163, 114, 19);
+		contentPane.add(textPaneRTTEnv);
 
 		textFieldTempoEnv = new JTextField();
 		textFieldTempoEnv.setColumns(10);
@@ -169,6 +170,10 @@ public class Main extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				int porta = Integer.parseInt(textFieldPort.getText());
 				server = new Server(porta, progressBarRecebendo, textFieldRTTRec, textFieldTempoRec);
+
+				int porta=Integer.parseInt(textFieldPort.getText());
+				server=new Server(porta,progressBarRecebendo,textPaneRTTRec,textFieldTempoRec,lblIp);
+
 				Thread serverThread = new Thread(server);
 				serverThread.start();
 			}
@@ -202,10 +207,14 @@ public class Main extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 
 				String ip = textFieldIp.getText();
+				if(ip==null||ip.equalsIgnoreCase("")||ip.length()<6) {
+					JOptionPane.showMessageDialog(null,"Campo ip com erro!");
+				}
+				if(textFieldPort==null) {
+					JOptionPane.showMessageDialog(null,"Campo porta com erro!");
+				}
 				int porta = Integer.parseInt(textFieldPort.getText());
-				if (ip == null || ip.length() < 8 || textFieldPort.getText() == null) {
-					JOptionPane.showConfirmDialog(null, "Preencha os campos corretamente!");
-				} else {
+        else {
 
 					enviar = 1;
 					cliente = new Cliente(ip, porta, nomeArquivo, path, enviar, progressBar, textFieldRTTEnv,
@@ -213,6 +222,7 @@ public class Main extends JFrame {
 					Thread t = new Thread(cliente);
 					t.start();
 				}
+
 			}
 		});
 		btnIniciar.setBounds(48, 357, 117, 25);
@@ -223,7 +233,6 @@ public class Main extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 				cliente.pararEnvio(1);
 				JOptionPane.showConfirmDialog(null, "Transferência parada!");
-
 			}
 		});
 		buttonParar.setBounds(202, 357, 117, 25);
@@ -232,11 +241,16 @@ public class Main extends JFrame {
 		buttonReiniciar = new JButton("Reiniciar");// botão para recomecar transferencia
 		buttonReiniciar.setBounds(497, 357, 117, 25);
 		contentPane.add(buttonReiniciar);
+  
+		buttonReiniciar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				reiniciar=1;
+			}
+		});
 
 		buttonCancelar = new JButton("Cancelar");// botão para cancelar
 		buttonCancelar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-
 				cliente.cancelarEnvio(1);
 				JOptionPane.showConfirmDialog(null, "Transferência cancelada!");
 
@@ -252,6 +266,10 @@ public class Main extends JFrame {
 		JLabel label_4 = new JLabel("ms");
 		label_4.setBounds(572, 165, 70, 15);
 		contentPane.add(label_4);
+		
+		lblIp = new JLabel("IP:");
+		lblIp.setBounds(48, 129, 353, 15);
+		contentPane.add(lblIp);
 
 	}
 }
