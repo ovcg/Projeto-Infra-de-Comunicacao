@@ -10,7 +10,6 @@ import controle.Server;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -33,6 +32,7 @@ public class Main extends JFrame {
 	private JLabel lblEndereoDestino;
 	private JLabel lblPortaDestino;
 	private JLabel lblTamanhoDoArquivo;
+	private JLabel lblIp;
 	private JButton buttonParar;
 	private JButton buttonRecomecar;
 	private JButton buttonCancelar;
@@ -175,7 +175,7 @@ public class Main extends JFrame {
 		btnEscutar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int porta=Integer.parseInt(textFieldPort.getText());
-				server=new Server(porta,progressBarRecebendo,textPaneRTTRec,textFieldTempoRec);
+				server=new Server(porta,progressBarRecebendo,textPaneRTTRec,textFieldTempoRec,lblIp);
 				Thread serverThread = new Thread(server);
 				serverThread.start();
 			}
@@ -232,13 +232,18 @@ public class Main extends JFrame {
 		buttonParar = new JButton("Parar");//botão para parar
 		buttonParar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				
+				parar=1;
 			}
 		});
 		buttonParar.setBounds(202, 357, 117, 25);
 		contentPane.add(buttonParar);
 
 		buttonRecomecar = new JButton("Restart");//botão para recomecar transferencia
+		buttonRecomecar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				reiniciar=1;
+			}
+		});
 		buttonRecomecar.setBounds(497, 357, 117, 25);
 		contentPane.add(buttonRecomecar);
 
@@ -247,7 +252,14 @@ public class Main extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 					cancelar=1;
 					
-					JOptionPane.showMessageDialog(null,"Transferência cancelada!");
+					try {
+						cliente.setCancelar(cancelar);
+						JOptionPane.showMessageDialog(null,"Transferência cancelada!");
+					} catch (InterruptedException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+				
 				
 
 			}
@@ -262,6 +274,10 @@ public class Main extends JFrame {
 		JLabel label_4 = new JLabel("ms");
 		label_4.setBounds(572, 165, 70, 15);
 		contentPane.add(label_4);
+		
+		lblIp = new JLabel("IP:");
+		lblIp.setBounds(48, 129, 353, 15);
+		contentPane.add(lblIp);
 
 	
 		
