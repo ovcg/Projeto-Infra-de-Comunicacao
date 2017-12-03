@@ -96,10 +96,7 @@ public class Cliente implements Runnable {
 				tamArq = file.length();
 				nomeArq = file.getName();
 
-				System.out.println("Cliente enviando endereço IP:" + nomeArq);
-				// Enviando ip
-				outputStream.write(Inet4Address.getLocalHost().getHostAddress().getBytes("UTF_16"));
-				inputStream.read();
+				
 				
 				System.out.println("Cliente enviando nome do arquivo:" + nomeArq);
 				// Enviando nome do arquivo

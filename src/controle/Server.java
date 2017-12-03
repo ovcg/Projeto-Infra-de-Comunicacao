@@ -69,18 +69,7 @@ public class Server implements Runnable {
 			t.start();
 			rtt.setAuxThread(false);
 
-			// IP recebido
-			byte[] ipRec = new byte[150];
-			input.read(ipRec);
-			
-			String ipRecebido=new String(ipRec,StandardCharsets.UTF_16);
-			int pos=ipRecebido.indexOf(0);
-
-			if (pos != -1) {
-				ipRecebido = ipRecebido.substring(0, pos);
-			}
-			lblIp.setText("IP recebido: "+ipRecebido);//Colocando ip recebido na gui
-			
+						
 			// Nome do arquivo
 			byte[] nomeArq = new byte[150];
 			input.read(nomeArq);
