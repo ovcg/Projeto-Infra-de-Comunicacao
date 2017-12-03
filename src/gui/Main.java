@@ -9,14 +9,13 @@ import controle.Server;
 
 import javax.swing.JTextField;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
-
+import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 
 public class Main extends JFrame {
@@ -33,7 +32,7 @@ public class Main extends JFrame {
 	private JLabel lblPortaDestino;
 	private JLabel lblTamanhoDoArquivo;
 	private JButton buttonParar;
-	private JButton buttonRecomecar;
+	private JButton buttonReiniciar;
 	private JButton buttonCancelar;
 	private JTextField textFieldRTTRec;
 	private JTextField textFieldRTTEnv;
@@ -41,12 +40,13 @@ public class Main extends JFrame {
 	private JTextField textFieldTempoRec;
 	private JProgressBar progressBarRecebendo;
 	private JProgressBar progressBar;
-	
+
 	private String path;
 	private String nomeArquivo;
 	private File file;
+	private Server server;
+	private Cliente cliente;
 	private int enviar = 0;
-
 
 	/**
 	 * Launch the application.
@@ -57,7 +57,7 @@ public class Main extends JFrame {
 				try {
 					Main frame = new Main();
 					frame.setVisible(true);
-					
+
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -82,7 +82,7 @@ public class Main extends JFrame {
 		textFieldIp.setColumns(10);
 		textFieldIp.setBounds(88, 15, 117, 19);
 		contentPane.add(textFieldIp);
-		
+
 		progressBar = new JProgressBar();
 		progressBar.setStringPainted(true);
 		progressBar.setBounds(163, 160, 234, 25);
@@ -90,8 +90,6 @@ public class Main extends JFrame {
 		JLabel lblRecebendo = new JLabel("Recebendo:");
 		lblRecebendo.setBounds(48, 244, 108, 15);
 		contentPane.add(lblRecebendo);
-
-		
 
 		JLabel label_1 = new JLabel("RTT:");
 		label_1.setBounds(415, 244, 70, 15);
@@ -113,7 +111,7 @@ public class Main extends JFrame {
 
 		textFieldTempoEnv = new JTextField();
 		textFieldTempoEnv.setColumns(10);
-		textFieldTempoEnv.setBounds(202, 197, 114, 19);
+		textFieldTempoEnv.setBounds(173, 197, 114, 19);
 		contentPane.add(textFieldTempoEnv);
 
 		textFieldTempoRec = new JTextField();
@@ -122,7 +120,7 @@ public class Main extends JFrame {
 		contentPane.add(textFieldTempoRec);
 
 		JLabel lblMs = new JLabel("segundos");
-		lblMs.setBounds(327, 197, 70, 15);
+		lblMs.setBounds(305, 199, 70, 15);
 		contentPane.add(lblMs);
 
 		JLabel lblSegundos = new JLabel("segundos");
@@ -131,9 +129,8 @@ public class Main extends JFrame {
 		progressBarRecebendo = new JProgressBar();
 		progressBarRecebendo.setStringPainted(true);
 		progressBarRecebendo.setBounds(163, 243, 234, 25);
-		contentPane.add(progressBarRecebendo);		
-			
-		
+		contentPane.add(progressBarRecebendo);
+
 		textFieldPort = new JTextField();
 		textFieldPort.setColumns(10);
 		textFieldPort.setBounds(310, 15, 75, 19);
@@ -159,7 +156,6 @@ public class Main extends JFrame {
 		lblEnviando.setBounds(49, 170, 108, 15);
 		contentPane.add(lblEnviando);
 
-
 		JLabel label_3 = new JLabel("RTT:");
 		label_3.setBounds(413, 165, 70, 15);
 		contentPane.add(label_3);
@@ -167,18 +163,18 @@ public class Main extends JFrame {
 		JLabel lblTempoEstimado = new JLabel("Tempo Estimado:");
 		lblTempoEstimado.setBounds(48, 197, 136, 15);
 		contentPane.add(lblTempoEstimado);
-		
+
 		JButton btnEscutar = new JButton("Escutar");
 		btnEscutar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				int porta=Integer.parseInt(textFieldPort.getText());
-				Thread serverThread = new Thread(new Server(porta,progressBarRecebendo,textFieldRTTRec,textFieldTempoRec));
+				int porta = Integer.parseInt(textFieldPort.getText());
+				server = new Server(porta, progressBarRecebendo, textFieldRTTRec, textFieldTempoRec);
+				Thread serverThread = new Thread(server);
 				serverThread.start();
 			}
 		});
 		btnEscutar.setBounds(413, 12, 117, 25);
-		contentPane.add(btnEscutar);	
-		
+		contentPane.add(btnEscutar);
 
 		JButton btnNewButton = new JButton("Escolher Arquivo");
 		btnNewButton.addActionListener(new ActionListener() {
@@ -204,54 +200,58 @@ public class Main extends JFrame {
 		JButton btnIniciar = new JButton("Iniciar");
 		btnIniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+
 				String ip = textFieldIp.getText();
 				int porta = Integer.parseInt(textFieldPort.getText());
-				enviar = 1;
-				Cliente cliente = new Cliente(ip, porta, nomeArquivo, path, enviar,progressBar,textFieldRTTEnv,textFieldRTTEnv);
-				Thread t = new Thread(cliente);
-				t.start();
+				if (ip == null || ip.length() < 8 || textFieldPort.getText() == null) {
+					JOptionPane.showConfirmDialog(null, "Preencha os campos corretamente!");
+				} else {
 
+					enviar = 1;
+					cliente = new Cliente(ip, porta, nomeArquivo, path, enviar, progressBar, textFieldRTTEnv,
+							textFieldTempoEnv);
+					Thread t = new Thread(cliente);
+					t.start();
+				}
 			}
 		});
 		btnIniciar.setBounds(48, 357, 117, 25);
 		contentPane.add(btnIniciar);
-		
-	
 
-		buttonParar = new JButton("Parar");//botão para parar
+		buttonParar = new JButton("Parar");// botão para parar
 		buttonParar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				cliente.pararEnvio(1);
+				JOptionPane.showConfirmDialog(null, "Transferência parada!");
+
 			}
 		});
 		buttonParar.setBounds(202, 357, 117, 25);
 		contentPane.add(buttonParar);
 
-		buttonRecomecar = new JButton("Restart");//botão para recomecar transferencia
-		buttonRecomecar.setBounds(497, 357, 117, 25);
-		contentPane.add(buttonRecomecar);
+		buttonReiniciar = new JButton("Reiniciar");// botão para recomecar transferencia
+		buttonReiniciar.setBounds(497, 357, 117, 25);
+		contentPane.add(buttonReiniciar);
 
-		buttonCancelar = new JButton("Cancelar");//botão para cancelar
+		buttonCancelar = new JButton("Cancelar");// botão para cancelar
 		buttonCancelar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JDialog dialog = new JDialog();
-				dialog.setTitle("Transferência cancelada");
-				dialog.setVisible(true);
+
+				cliente.cancelarEnvio(1);
+				JOptionPane.showConfirmDialog(null, "Transferência cancelada!");
 
 			}
 		});
 		buttonCancelar.setBounds(352, 357, 117, 25);
 		contentPane.add(buttonCancelar);
-		
+
 		JLabel label_2 = new JLabel("ms");
 		label_2.setBounds(572, 244, 70, 15);
 		contentPane.add(label_2);
-		
+
 		JLabel label_4 = new JLabel("ms");
 		label_4.setBounds(572, 165, 70, 15);
 		contentPane.add(label_4);
 
-	
-		
-		
 	}
 }

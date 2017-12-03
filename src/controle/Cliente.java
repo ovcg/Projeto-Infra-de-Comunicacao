@@ -25,6 +25,9 @@ public class Cliente implements Runnable {
 	private JProgressBar progressbar;
 	private JTextField rttEnv;
 	private JTextField tempoEstimado;
+	private int parar=0;
+	private int cancelar=0;
+	private int reiniciar=0;
 
 	public Cliente(String ip, int porta, String nomeArq, String path, int enviar, JProgressBar progress,
 			JTextField rttEnv, JTextField tempoEstimado) {
@@ -118,7 +121,8 @@ public class Cliente implements Runnable {
 					}
 
 				}
-
+				tempoEstimado.setText(""+0);
+				enviar=0;
 			}
 			rtt.setAuxThread(true);
 			inputStream.close();
@@ -134,15 +138,17 @@ public class Cliente implements Runnable {
 	}
 
 	public void pararEnvio(int parar) {
-
+		this.parar=parar;
+		
 	}
 
-	public void cancelarEnvio(int parar) {
-
+	public void cancelarEnvio(int cancelar) {
+			this.cancelar=cancelar;
 	}
 
 	public void restart(int restart) {
 
+		this.reiniciar=restart;
 	}
 
 }
