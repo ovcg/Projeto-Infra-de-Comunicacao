@@ -8,6 +8,7 @@ import controle.Cliente;
 import controle.Server;
 
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -16,7 +17,7 @@ import java.io.File;
 import java.io.IOException;
 import java.awt.event.ActionEvent;
 import javax.swing.JLabel;
-
+import javax.swing.JOptionPane;
 import javax.swing.JProgressBar;
 
 public class Main extends JFrame {
@@ -35,18 +36,22 @@ public class Main extends JFrame {
 	private JButton buttonParar;
 	private JButton buttonRecomecar;
 	private JButton buttonCancelar;
-	private JTextField textFieldRTTRec;
-	private JTextField textFieldRTTEnv;
+	private JTextPane textPaneRTTRec;
+	private JTextPane textPaneRTTEnv;
 	private JTextField textFieldTempoEnv;
 	private JTextField textFieldTempoRec;
 	private JProgressBar progressBarRecebendo;
 	private JProgressBar progressBar;
 	
+	private Cliente cliente;
+	private Server server;
 	private String path;
 	private String nomeArquivo;
 	private File file;
 	private int enviar = 0;
-
+	private int parar=0;
+	private int reiniciar=0;
+	private int cancelar=0;
 
 	/**
 	 * Launch the application.
@@ -101,15 +106,13 @@ public class Main extends JFrame {
 		lblTempoEstimado_1.setBounds(48, 297, 124, 15);
 		contentPane.add(lblTempoEstimado_1);
 
-		textFieldRTTRec = new JTextField();
-		textFieldRTTRec.setBounds(454, 244, 114, 19);
-		contentPane.add(textFieldRTTRec);
-		textFieldRTTRec.setColumns(10);
+		textPaneRTTRec = new JTextPane();
+		textPaneRTTRec.setBounds(454, 244, 114, 19);
+		contentPane.add(textPaneRTTRec);
 
-		textFieldRTTEnv = new JTextField();
-		textFieldRTTEnv.setColumns(10);
-		textFieldRTTEnv.setBounds(454, 163, 114, 19);
-		contentPane.add(textFieldRTTEnv);
+		textPaneRTTEnv = new JTextPane();
+		textPaneRTTEnv.setBounds(454, 163, 114, 19);
+		contentPane.add(textPaneRTTEnv);
 
 		textFieldTempoEnv = new JTextField();
 		textFieldTempoEnv.setColumns(10);
@@ -172,7 +175,8 @@ public class Main extends JFrame {
 		btnEscutar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int porta=Integer.parseInt(textFieldPort.getText());
-				Thread serverThread = new Thread(new Server(porta,progressBarRecebendo,textFieldRTTRec,textFieldTempoRec));
+				server=new Server(porta,progressBarRecebendo,textPaneRTTRec,textFieldTempoRec);
+				Thread serverThread = new Thread(server);
 				serverThread.start();
 			}
 		});
@@ -205,9 +209,16 @@ public class Main extends JFrame {
 		btnIniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				String ip = textFieldIp.getText();
+				if(ip==null||ip.equalsIgnoreCase("")||ip.length()<6) {
+					JOptionPane.showMessageDialog(null,"Campo ip com erro!");
+				}
+				if(textFieldPort==null) {
+					JOptionPane.showMessageDialog(null,"Campo porta com erro!");
+				}
 				int porta = Integer.parseInt(textFieldPort.getText());
+				
 				enviar = 1;
-				Cliente cliente = new Cliente(ip, porta, nomeArquivo, path, enviar,progressBar,textFieldRTTEnv,textFieldRTTEnv);
+				cliente = new Cliente(ip, porta, nomeArquivo, path, enviar,progressBar,textPaneRTTEnv,textFieldTempoEnv);
 				Thread t = new Thread(cliente);
 				t.start();
 
@@ -221,6 +232,7 @@ public class Main extends JFrame {
 		buttonParar = new JButton("Parar");//botão para parar
 		buttonParar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
+				
 			}
 		});
 		buttonParar.setBounds(202, 357, 117, 25);
@@ -233,9 +245,10 @@ public class Main extends JFrame {
 		buttonCancelar = new JButton("Cancelar");//botão para cancelar
 		buttonCancelar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				JDialog dialog = new JDialog();
-				dialog.setTitle("Transferência cancelada");
-				dialog.setVisible(true);
+					cancelar=1;
+					
+					JOptionPane.showMessageDialog(null,"Transferência cancelada!");
+				
 
 			}
 		});

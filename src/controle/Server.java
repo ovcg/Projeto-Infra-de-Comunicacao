@@ -14,6 +14,7 @@ import java.text.DecimalFormat;
 
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 import base.RTTRecebendo;
 
@@ -22,18 +23,16 @@ public class Server implements Runnable {
 	private int porta;
 	private ServerSocket server;
 	private JProgressBar progressBar;
-	private JTextField rttRec;
+	private JTextPane rttRec;
 	private JTextField tempoEstimado;
-	
 
-	public Server(int porta,JProgressBar progressBar,JTextField rttRec, JTextField tempoEstimado) {
-		this.porta=porta;
+	public Server(int porta, JProgressBar progressBar, JTextPane rttRec, JTextField tempoEstimado) {
+		this.porta = porta;
 		this.progressBar = progressBar;
-		this.rttRec=rttRec;
-		this.tempoEstimado=tempoEstimado;
-		
-	}
+		this.rttRec = rttRec;
+		this.tempoEstimado = tempoEstimado;
 
+	}
 
 	@Override
 	public void run() {
@@ -99,7 +98,23 @@ public class Server implements Runnable {
 			File arquivo = new File("Recebidos"+File.separator+nome);
 			fileOutput = new FileOutputStream(arquivo);
 			data=new DataInputStream(input); 
-
+			String cancelar="";
+			cancelar=data.readUTF();
+			
+			if(cancelar.equalsIgnoreCase("Cancelar")) {
+				try {
+					buffer.wait(5000);
+					Thread.sleep(5000);
+					progressBar.setValue(0);
+					progressBar.setString(0 + " %");
+					progressBar.setStringPainted(true);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				
+			}
+			else {
 			while ((bytesLidos = data.read(buffer)) >0) {// Recebendo o arquivo
 				
 				fileOutput.write(buffer, 0, bytesLidos);
@@ -127,7 +142,7 @@ public class Server implements Runnable {
 				
 			}
 			
-			
+			}
 			fileOutput.close();
 			data.close();
 			socket.close();

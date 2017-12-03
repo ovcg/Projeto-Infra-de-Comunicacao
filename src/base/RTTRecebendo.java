@@ -8,14 +8,14 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 public class RTTRecebendo implements Runnable {
 
 	private boolean auxThread = false;
-	private JTextField rttRec;
+	private JTextPane rttRec;
 
-	public RTTRecebendo(JTextField rttRec) {
+	public RTTRecebendo(JTextPane rttRec) {
 
 		this.rttRec = rttRec;
 	}

@@ -12,6 +12,7 @@ import java.text.DecimalFormat;
 
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
+import javax.swing.JTextPane;
 
 import base.RTTEnviando;
 
@@ -23,11 +24,14 @@ public class Cliente implements Runnable {
 	private String path;
 	private int enviar;
 	private JProgressBar progressbar;
-	private JTextField rttEnv;
+	private JTextPane rttEnv;
 	private JTextField tempoEstimado;
+	private int cancelar = 0;
+	private int parar = 0;
+	private int restart = 0;
 
 	public Cliente(String ip, int porta, String nomeArq, String path, int enviar, JProgressBar progress,
-			JTextField rttEnv, JTextField tempoEstimado) {
+			JTextPane rttEnv, JTextField tempoEstimado) {
 		this.ip = ip;
 		this.porta = porta;
 		this.nomeArq = nomeArq;
@@ -37,6 +41,19 @@ public class Cliente implements Runnable {
 		this.rttEnv = rttEnv;
 		this.tempoEstimado = tempoEstimado;
 
+	}
+
+	public void setCancelar(int cancelar) throws InterruptedException {
+		this.cancelar = cancelar;
+
+	}
+
+	public void pararEnvio(int parar) {
+		this.parar = parar;
+	}
+
+	public void restart(int restart) {
+		this.restart = restart;
 	}
 
 	@Override
@@ -71,7 +88,7 @@ public class Cliente implements Runnable {
 			t.start();
 			rtt.setAuxThread(false);
 
-			if (enviar == 1) {
+			if ((enviar == 1 && parar == 0) || (enviar == 1 && cancelar == 0) || (enviar == 1 && restart == 0)) {
 
 				File file = new File(path);
 				tamArq = file.length();
@@ -95,53 +112,72 @@ public class Cliente implements Runnable {
 				out = new DataOutputStream(outputStream);
 
 				while ((bytesLidos = fileInput.read(buffer)) > 0) {// Enviando arquivo
+					if ((enviar == 1 && parar == 0) || (enviar == 1 && cancelar == 0)
+							|| (enviar == 1 && restart == 0)) {
+						out.write(buffer, 0, bytesLidos);
+						out.flush();
+						arqEnviado += bytesLidos;
 
-					out.write(buffer, 0, bytesLidos);
-					out.flush();
-					arqEnviado += bytesLidos;
+						// Atualizando ProgessBar
+						progressbar.setValue((int) ((arqEnviado * 100) / tamArq));
+						progressbar.setString(Long.toString(((arqEnviado * 100) / tamArq)) + " %");
+						progressbar.setStringPainted(true);
 
-					// Atualizando ProgessBar
-					progressbar.setValue((int) ((arqEnviado * 100) / tamArq));
-					progressbar.setString(Long.toString(((arqEnviado * 100) / tamArq)) + " %");
-					progressbar.setStringPainted(true);
+						if (arqEnviado > 10000 && (System.currentTimeMillis() - atualizaTempo) > 1000) {
+							duracao = System.currentTimeMillis() - tempoInicial;
+							long div = arqEnviado / duracao;
+							vel = div * 1000;
+							tempoRestante = (tamArq - arqEnviado) / vel;
+							DecimalFormat dec = new DecimalFormat("#");
+							String auxDec = "" + dec.format(tempoRestante);
+							tempoEstimado.setText(auxDec);
+							atualizaTempo = System.currentTimeMillis();
 
-					if (arqEnviado > 10000 && (System.currentTimeMillis() - atualizaTempo) > 1000) {
-						duracao = System.currentTimeMillis() - tempoInicial;
-						long div = arqEnviado / duracao;
-						vel = div * 1000;
-						tempoRestante = (tamArq - arqEnviado) / vel;
-						DecimalFormat dec = new DecimalFormat("#");
-						String auxDec = "" + dec.format(tempoRestante);
-						tempoEstimado.setText(auxDec);
-						atualizaTempo = System.currentTimeMillis();
-
+						}
+						if (cancelar == 1) {
+							progressbar.setValue(0);
+							progressbar.setString(0 + " %");
+							progressbar.setStringPainted(true);
+							String cancelar="Cancelar";
+							out.write(cancelar.getBytes());
+							out.flush();
+							try {
+								Thread.sleep(5000);
+							} catch (InterruptedException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}			
 					}
+					else if (cancelar == 1) {
+						progressbar.setValue(0);
+						progressbar.setString(0 + " %");
+						progressbar.setStringPainted(true);
+						String cancelar="Cancelar";
+						out.write(cancelar.getBytes());
+						out.flush();
+						try {
+							Thread.sleep(5000);
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}		
 
 				}
-
+				
 			}
+
 			rtt.setAuxThread(true);
 			inputStream.close();
 			outputStream.close();
 			fileInput.close();
-			out.close();			
+			out.close();
 			socket.close();
 
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
-
-	}
-
-	public void pararEnvio(int parar) {
-
-	}
-
-	public void cancelarEnvio(int parar) {
-
-	}
-
-	public void restart(int restart) {
 
 	}
 
