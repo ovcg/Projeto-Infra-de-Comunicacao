@@ -26,7 +26,12 @@ public class Server implements Runnable {
 	private JProgressBar progressBar;
 	private JTextPane rttRec;
 	private JTextField tempoEstimado;
+
+	private int parar=0;
+	private int cancelar=0;
+	private int reiniciar=0;
 	private JLabel lblIp;
+
 
 	public Server(int porta, JProgressBar progressBar, JTextPane rttRec, JTextField tempoEstimado, JLabel lblIp) {
 		this.porta = porta;
@@ -143,6 +148,8 @@ public class Server implements Runnable {
 				}
 
 			}
+
+			tempoEstimado.setText(""+0);
 			fileOutput.close();
 			data.close();
 			socket.close();
@@ -153,6 +160,20 @@ public class Server implements Runnable {
 			e.printStackTrace();
 		}
 
+	}
+	
+	public void pararEnvio(int parar) {
+		this.parar=parar;
+		
+	}
+
+	public void cancelarEnvio(int cancelar) {
+			this.cancelar=cancelar;
+	}
+
+	public void restart(int restart) {
+
+		this.reiniciar=restart;
 	}
 
 }

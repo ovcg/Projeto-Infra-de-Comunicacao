@@ -27,9 +27,10 @@ public class Cliente implements Runnable {
 	private JProgressBar progressbar;
 	private JTextPane rttEnv;
 	private JTextField tempoEstimado;
-	private int cancelar = 0;
-	private int parar = 0;
-	private int restart = 0;
+	private int parar=0;
+	private int cancelar=0;
+	private int reiniciar=0;
+
 
 	public Cliente(String ip, int porta, String nomeArq, String path, int enviar, JProgressBar progress,
 			JTextPane rttEnv, JTextField tempoEstimado) {
@@ -169,7 +170,9 @@ public class Cliente implements Runnable {
 					}		
 
 				}
-				
+
+				tempoEstimado.setText(""+0);
+				enviar=0;
 			}
 
 			rtt.setAuxThread(true);
@@ -183,6 +186,20 @@ public class Cliente implements Runnable {
 			e1.printStackTrace();
 		}
 
+	}
+
+	public void pararEnvio(int parar) {
+		this.parar=parar;
+		
+	}
+
+	public void cancelarEnvio(int cancelar) {
+			this.cancelar=cancelar;
+	}
+
+	public void restart(int restart) {
+
+		this.reiniciar=restart;
 	}
 
 }
