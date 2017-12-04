@@ -259,7 +259,7 @@ public class Main extends JFrame {
 		buttonCancelar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				cliente.cancelarEnvio(1);
-				JOptionPane.showConfirmDialog(null, "Transferência cancelada!");
+				JOptionPane.showMessageDialog(null, "Transferência cancelada!");
 
 			}
 		});
