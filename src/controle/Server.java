@@ -78,6 +78,7 @@ public class Server implements Runnable {
 			input.read(nomeArq);
 
 			String nome = new String(nomeArq, StandardCharsets.UTF_16);
+			nome=formataString(nome);
 			output.write(prosseguir);
 
 			System.out.println("Recebendo arquivo: " + nome);
