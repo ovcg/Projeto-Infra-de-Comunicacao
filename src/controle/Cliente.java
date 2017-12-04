@@ -71,13 +71,11 @@ public class Cliente implements Runnable {
 			long duracao = 0;
 			double vel = 0;
 			double tempoRestante = 0;
-			int mega = 1000000;
 
 			RTTEnviando rtt = new RTTEnviando(ip, rttEnv);
 			Thread t = new Thread(rtt);
 			t.start();
 			rtt.setAux(0);
-	
 
 			if (enviar == 1) {
 
@@ -90,12 +88,12 @@ public class Cliente implements Runnable {
 				outputStream.write(nomeArq.getBytes("UTF_16"));
 				inputStream.read();
 
-				String ipEnv = InetAddress.getLocalHost().getHostAddress();
+				String ipEnv = InetAddress.getLocalHost().getHostAddress();//Enviando IP
 				outputStream.write(ipEnv.getBytes("UTF_16"));
 				inputStream.read();
 
 				System.out.println("Cliente enviando IP: " + ipEnv);
-
+				int mega = 1000000;
 				System.out.println("Cliente enviando tamanho do arquivo: " + tamArq / mega + " MB");
 
 				// Envia tamanho do arquivo
@@ -133,17 +131,17 @@ public class Cliente implements Runnable {
 				}
 
 			}
+			
 			tempoEstimado.setText("" + 0);
 			enviar = 0;
 			rtt.setAux(1);
 			rtt.setRTT("0");
-			
 			inputStream.close();
 			outputStream.close();
 			fileInput.close();
 			out.close();			
 			socket.close();
-			
+					
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
