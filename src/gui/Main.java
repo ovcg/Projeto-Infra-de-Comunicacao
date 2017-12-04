@@ -36,7 +36,6 @@ public class Main extends JFrame {
 	private JButton buttonParar;
 	private JButton buttonReiniciar;
 	private JButton buttonCancelar;
-	private JTextPane textFieldRTTRec;
 	private JTextPane rttEnv;
 	private JTextPane rttRec;
 	private JTextField textFieldTempoEnv;
@@ -164,11 +163,24 @@ public class Main extends JFrame {
 		lblTempoEstimado.setBounds(48, 197, 136, 15);
 		contentPane.add(lblTempoEstimado);
 
+
+		JLabel label_2 = new JLabel("ms");
+		label_2.setBounds(572, 244, 70, 15);
+		contentPane.add(label_2);
+
+		JLabel label_4 = new JLabel("ms");
+		label_4.setBounds(572, 165, 70, 15);
+		contentPane.add(label_4);
+		
+		lblIp = new JLabel("IP:");
+		lblIp.setBounds(48, 129, 353, 15);
+		contentPane.add(lblIp);
+		
 		JButton btnEscutar = new JButton("Escutar");
 		btnEscutar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int porta = Integer.parseInt(textFieldPort.getText());
-				server = new Server(porta, progressBarRecebendo, textFieldRTTRec, textFieldTempoRec,lblIp);
+				server = new Server(porta, progressBarRecebendo, rttRec, textFieldTempoRec,lblIp);
 
 				Thread serverThread = new Thread(server);
 				serverThread.start();
@@ -254,17 +266,6 @@ public class Main extends JFrame {
 		buttonCancelar.setBounds(352, 357, 117, 25);
 		contentPane.add(buttonCancelar);
 
-		JLabel label_2 = new JLabel("ms");
-		label_2.setBounds(572, 244, 70, 15);
-		contentPane.add(label_2);
-
-		JLabel label_4 = new JLabel("ms");
-		label_4.setBounds(572, 165, 70, 15);
-		contentPane.add(label_4);
-		
-		lblIp = new JLabel("IP:");
-		lblIp.setBounds(48, 129, 353, 15);
-		contentPane.add(lblIp);
 
 	}
 }
