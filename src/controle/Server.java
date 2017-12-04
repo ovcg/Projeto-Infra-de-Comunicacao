@@ -27,18 +27,17 @@ public class Server implements Runnable {
 	private JTextPane rttRec;
 	private JTextField tempoEstimado;
 
-	private int parar=0;
-	private int cancelar=0;
-	private int reiniciar=0;
+	private int parar = 0;
+	private int cancelar = 0;
+	private int reiniciar = 0;
 	private JLabel lblIp;
-
 
 	public Server(int porta, JProgressBar progressBar, JTextPane rttRec, JTextField tempoEstimado, JLabel lblIp) {
 		this.porta = porta;
 		this.progressBar = progressBar;
 		this.rttRec = rttRec;
 		this.tempoEstimado = tempoEstimado;
-		this.lblIp=lblIp;
+		this.lblIp = lblIp;
 
 	}
 
@@ -74,7 +73,6 @@ public class Server implements Runnable {
 			t.start();
 			rtt.setAuxThread(false);
 
-						
 			// Nome do arquivo
 			byte[] nomeArq = new byte[150];
 			input.read(nomeArq);
@@ -82,74 +80,61 @@ public class Server implements Runnable {
 			String nome = new String(nomeArq, StandardCharsets.UTF_16);
 			output.write(prosseguir);
 
-			int position = nome.indexOf(0);
-			if (position != -1) {
-				nome = nome.substring(0, position);
-			}
 			System.out.println("Recebendo arquivo: " + nome);
+			output.write(prosseguir);
+
+			byte[] ipRecebido = new byte[150];
+			input.read(ipRecebido);
+
+			String ipRec = new String(ipRecebido, StandardCharsets.UTF_16);
+			ipRec = formataString(ipRec);
+			lblIp.setText(ipRec);
 			output.write(prosseguir);
 
 			tempoInicial = System.currentTimeMillis();
 			atualizaTempo = tempoInicial;
 
-			// Recebendo tamanho do arquivo
-			byte[] aux = new byte[Long.BYTES];
-			input.read(aux);
-			ByteBuffer bufferTam = ByteBuffer.wrap(aux);
-			tamArq = bufferTam.getLong();
-			output.write(prosseguir);
-
-			System.out.println("Recebendo tamanho do arquivo: " + tamArq / 1000000 + " MB");
+			/*
+			 * // Recebendo tamanho do arquivo byte[] aux = new byte[Long.BYTES];
+			 * input.read(aux); ByteBuffer bufferTam = ByteBuffer.wrap(aux); tamArq =
+			 * bufferTam.getLong(); output.write(prosseguir);
+			 * 
+			 * System.out.println("Recebendo tamanho do arquivo: " + tamArq / 1000000 +
+			 * " MB");
+			 */
 
 			File arquivo = new File("Recebidos" + File.separator + nome);
 			fileOutput = new FileOutputStream(arquivo);
 			data = new DataInputStream(input);
-			String cancelar = "";
-			//cancelar = data.readUTF();
 
-			if (cancelar.equalsIgnoreCase("Cancelar")) {
-				try {
-					buffer.wait(5000);
-					Thread.sleep(5000);
-					progressBar.setValue(0);
-					progressBar.setString(0 + " %");
-					progressBar.setStringPainted(true);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
+			while ((bytesLidos = data.read(buffer)) > 0) {// Recebendo o arquivo
 
-			} else {
-				while ((bytesLidos = data.read(buffer)) > 0) {// Recebendo o arquivo
+				fileOutput.write(buffer, 0, bytesLidos);
+				fileOutput.flush();
 
-					fileOutput.write(buffer, 0, bytesLidos);
-					fileOutput.flush();
+				arqRecebido += bytesLidos;
 
-					arqRecebido += bytesLidos;
+				// Atualizando ProgessBar
 
-					// Atualizando ProgessBar
+				progressBar.setValue((int) ((arqRecebido * 100) / tamArq));
+				progressBar.setString(Long.toString((arqRecebido * 100) / tamArq) + " %");
+				progressBar.setStringPainted(true);
 
-					progressBar.setValue((int) ((arqRecebido * 100) / tamArq));
-					progressBar.setString(Long.toString((arqRecebido * 100) / tamArq) + " %");
-					progressBar.setStringPainted(true);
+				if (arqRecebido > 10000 && (System.currentTimeMillis() - atualizaTempo) > 1000) {
 
-					if (arqRecebido > 10000 && (System.currentTimeMillis() - atualizaTempo) > 1000) {
-
-						duracao = System.currentTimeMillis() - tempoInicial;
-						long div = arqRecebido / duracao;
-						vel = div * 1000;
-						tempoRestante = (tamArq - arqRecebido) / vel;
-						DecimalFormat dec = new DecimalFormat("#");
-						String auxDec = "" + dec.format(tempoRestante);
-						tempoEstimado.setText(auxDec);
-						atualizaTempo = System.currentTimeMillis();
-					}
-
+					duracao = System.currentTimeMillis() - tempoInicial;
+					long div = arqRecebido / duracao;
+					vel = div * 1000;
+					tempoRestante = (tamArq - arqRecebido) / vel;
+					DecimalFormat dec = new DecimalFormat("#");
+					String auxDec = "" + dec.format(tempoRestante);
+					tempoEstimado.setText(auxDec);
+					atualizaTempo = System.currentTimeMillis();
 				}
 
 			}
 
-			tempoEstimado.setText(""+0);
+			tempoEstimado.setText("" + 0);
 			fileOutput.close();
 			data.close();
 			socket.close();
@@ -161,19 +146,28 @@ public class Server implements Runnable {
 		}
 
 	}
-	
+
+	public String formataString(String in) {
+		int pos = in.indexOf(0);
+		if (pos != -1) {
+			in = in.substring(0, pos);
+		}
+
+		return in;
+	}
+
 	public void pararEnvio(int parar) {
-		this.parar=parar;
-		
+		this.parar = parar;
+
 	}
 
 	public void cancelarEnvio(int cancelar) {
-			this.cancelar=cancelar;
+		this.cancelar = cancelar;
 	}
 
 	public void restart(int restart) {
 
-		this.reiniciar=restart;
+		this.reiniciar = restart;
 	}
 
 }
