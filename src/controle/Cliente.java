@@ -63,6 +63,7 @@ public class Cliente implements Runnable {
 			inputStream.read();
 
 			byte[] buffer = new byte[5000];
+			byte[] bufferCancelar = new byte[1024];
 			int bytesLidos = 0;
 			long tamArq = 0;
 			long arqEnviado = 0;
@@ -88,7 +89,7 @@ public class Cliente implements Runnable {
 				outputStream.write(nomeArq.getBytes("UTF_16"));
 				inputStream.read();
 
-				String ipEnv = InetAddress.getLocalHost().getHostAddress();//Enviando IP
+				String ipEnv = InetAddress.getLocalHost().getHostAddress();// Enviando IP
 				outputStream.write(ipEnv.getBytes("UTF_16"));
 				inputStream.read();
 
@@ -107,31 +108,52 @@ public class Cliente implements Runnable {
 
 				while ((bytesLidos = fileInput.read(buffer)) > 0) {// Enviando arquivo
 
-					out.write(buffer, 0, bytesLidos);
-					out.flush();
-					arqEnviado += bytesLidos;
+					if (cancelar == 1) {
+						try {
+							out.write(bufferCancelar, 0, 0);
+							out.flush();
+							tempoEstimado.setText("" + 0);
+							enviar = 0;
+							rtt.setAux(1);
+							rtt.setRTT("0");
+							progressbar.setValue(0);
+							progressbar.setString(0 + " %");
+							progressbar.setStringPainted(true);
+							Thread.sleep(5000);
+							
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+						
 
-					// Atualizando ProgessBar
-					progressbar.setValue((int) ((arqEnviado * 100) / tamArq));
-					progressbar.setString(Long.toString(((arqEnviado * 100) / tamArq)) + " %");
-					progressbar.setStringPainted(true);
+					} else {
+						out.write(buffer, 0, bytesLidos);
+						out.flush();
+						arqEnviado += bytesLidos;
 
-					if (arqEnviado > 10000 && (System.currentTimeMillis() - atualizaTempo) > 1000) {
-						duracao = System.currentTimeMillis() - tempoInicial;
-						long div = arqEnviado / duracao;
-						vel = div * 1000;
-						tempoRestante = (tamArq - arqEnviado) / vel;
-						DecimalFormat dec = new DecimalFormat("#");
-						String auxDec = "" + dec.format(tempoRestante);
-						tempoEstimado.setText(auxDec);
-						atualizaTempo = System.currentTimeMillis();
+						// Atualizando ProgessBar
+						progressbar.setValue((int) ((arqEnviado * 100) / tamArq));
+						progressbar.setString(Long.toString(((arqEnviado * 100) / tamArq)) + " %");
+						progressbar.setStringPainted(true);
 
+						if (arqEnviado > 10000 && (System.currentTimeMillis() - atualizaTempo) > 1000) {
+							duracao = System.currentTimeMillis() - tempoInicial;
+							long div = arqEnviado / duracao;
+							vel = div * 1000;
+							tempoRestante = (tamArq - arqEnviado) / vel;
+							DecimalFormat dec = new DecimalFormat("#");
+							String auxDec = "" + dec.format(tempoRestante);
+							tempoEstimado.setText(auxDec);
+							atualizaTempo = System.currentTimeMillis();
+
+						}
 					}
 
 				}
 
 			}
-			
+
 			tempoEstimado.setText("" + 0);
 			enviar = 0;
 			rtt.setAux(1);
@@ -139,9 +161,9 @@ public class Cliente implements Runnable {
 			inputStream.close();
 			outputStream.close();
 			fileInput.close();
-			out.close();			
+			out.close();
 			socket.close();
-					
+
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}

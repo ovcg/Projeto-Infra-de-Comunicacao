@@ -83,10 +83,7 @@ public class Server implements Runnable {
 
 			String nome = new String(nomeArq, StandardCharsets.UTF_16);
 			
-			int position=nome.indexOf(0);
-			if(position!=-1) {
-				nome=nome.substring(0,position);
-			}
+			nome=formataString(nome);
 			System.out.println("Recebendo arquivo: " + nome);
 			output.write(prosseguir);
 			
@@ -98,7 +95,7 @@ public class Server implements Runnable {
 			
 			String ipRec = new String(ipRecebido, StandardCharsets.UTF_16);
 			ipRec = formataString(ipRec);
-			lblIp.setText(ipRec);
+			lblIp.setText("IP fonte:"+ipRec);
 			output.write(prosseguir);
 			
 			// Recebendo tamanho do arquivo
@@ -164,20 +161,6 @@ public class Server implements Runnable {
 		}
 
 		return in;
-	}
-
-	public void pararEnvio(int parar) {
-		this.parar = parar;
-
-	}
-
-	public void cancelarEnvio(int cancelar) {
-		this.cancelar = cancelar;
-	}
-
-	public void restart(int restart) {
-
-		this.reiniciar = restart;
 	}
 
 }
