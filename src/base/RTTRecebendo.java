@@ -11,6 +11,7 @@ import java.net.Socket;
 import javax.swing.JTextPane;
 
 public class RTTRecebendo implements Runnable {
+
 	private JTextPane showRTT;
 	private int auxThread = 0;
 
@@ -38,25 +39,21 @@ public class RTTRecebendo implements Runnable {
 			inputStream = socket.getInputStream();
 
 			InputStreamReader entrada = new InputStreamReader(inputStream);
-			BufferedReader leitura = new BufferedReader(entrada);
-			long RTT_time = 0;
-			String fileName = "RTT\n";
-			long initialTime;
 
 			while (true) {
-				// RECEBE
-				while (!leitura.ready() && auxThread == 0)
-					;
+
+				while (!leitura.ready() && auxThread == 0);
 				if (leitura.ready())
 					leitura.readLine();
 				initialTime = System.nanoTime();
+
 				if (auxThread == 1) {
 					break;
 				}
-				// ENVIA
+				
 				outputStream.write(fileName.getBytes());
 				outputStream.flush();
-				// RECEBE
+			
 				while (!leitura.ready() && auxThread == 0);
 				if (leitura.ready()) {
 					if (leitura.readLine().equals("RTT2")) {
@@ -64,8 +61,9 @@ public class RTTRecebendo implements Runnable {
 
 					}
 				}
-				double RTT_micro = RTT_time / 1000;
-				showRTT.setText(String.valueOf(RTT_micro));
+				double rtt_ms = rtt_ms / 1000000;
+
+				showRTT.setText(String.valueOf(rtt_ms));
 
 				if (auxThread == 1) {
 					break;
@@ -76,10 +74,11 @@ public class RTTRecebendo implements Runnable {
 				}
 
 			}
+
 			inputStream.close();
 			outputStream.close();
 			socket.close();
-			serverSocket.close();
+			socket_server.close();
 
 		} catch (IOException e) {
 			e.printStackTrace();

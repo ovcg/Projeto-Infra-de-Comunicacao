@@ -77,7 +77,7 @@ public class Cliente implements Runnable {
 			Thread t = new Thread(rtt);
 			t.start();
 			rtt.setAux(0);
-			;
+	
 
 			if (enviar == 1) {
 
@@ -137,7 +137,6 @@ public class Cliente implements Runnable {
 			enviar = 0;
 			rtt.setAux(1);
 			rtt.setRTT("0");
-
 			inputStream.close();
 			outputStream.close();
 			fileInput.close();

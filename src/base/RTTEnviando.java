@@ -10,6 +10,7 @@ import java.net.Socket;
 import javax.swing.JTextPane;
 
 public class RTTEnviando implements Runnable {
+
 	private String ip;
 	private JTextPane showRTT;
 	private int auxThread = 0;
@@ -55,10 +56,11 @@ public class RTTEnviando implements Runnable {
 				while (!buffer.ready() && auxThread == 0);
 				if (buffer.ready()) {
 					if (buffer.readLine().equals("RTT")) {
-						;
+
 						RTT_time = System.nanoTime() - initialTime;
 					}
 				}
+
 				flag = "RTT2\n";
 			
 				if (auxThread == 1) {
@@ -76,13 +78,16 @@ public class RTTEnviando implements Runnable {
 				}
 
 				Thread.sleep(1000);
+
 				if (auxThread == 1) {
-					break;
+
 				}
 
 			}
+
 			inputStream.close();
 			outputStream.close();
+
 			socket.close();
 
 		} catch (IOException e) {

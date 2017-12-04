@@ -72,7 +72,6 @@ public class Server implements Runnable {
 			Thread t = new Thread(rtt);
 			t.start();
 			rtt.setAux(0);
-			;
 
 			// Nome do arquivo
 			byte[] nomeArq = new byte[150];
@@ -136,6 +135,7 @@ public class Server implements Runnable {
 
 			}
 
+			rtt.setStop(1);
 			tempoEstimado.setText("" + 0);
 			rtt.setAux(1);
 			rtt.setRTT("0");
