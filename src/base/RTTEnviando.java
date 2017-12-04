@@ -10,75 +10,84 @@ import java.net.Socket;
 import javax.swing.JTextPane;
 
 public class RTTEnviando implements Runnable {
-	private String ip_text;
-	private JTextPane RTT_text;
-	private int flagThread = 0;
 
-	public RTTEnviando(String IP, JTextPane RTT_text) {
-		ip_text = IP;
-		this.RTT_text = RTT_text;
+	private String ip;
+	private JTextPane showRTT;
+	private int auxThread = 0;
+
+	public RTTEnviando(String ip, JTextPane showRTT) {
+		this.ip = ip;
+		this.showRTT = showRTT;
 	}
 
-	public void setStop(int i) {
-		this.flagThread = i;
+	public void setAux(int auxThread) {
+		this.auxThread = auxThread;
+	}
+
+	public void setRTT(String t) {
+		this.showRTT.setText(t);
 	}
 
 	public void run() {
-		OutputStream socket_out = null;
-		InputStream socket_in = null;
+		OutputStream outputStream = null;
+		InputStream inputStream = null;
 		Socket socket = null;
 		try {
-			socket = new Socket(ip_text, 3274);
+			socket = new Socket(ip, 3274);
 
-			socket_out = socket.getOutputStream();
-			socket_in = socket.getInputStream();
+			outputStream = socket.getOutputStream();
+			inputStream = socket.getInputStream();
 
-			InputStreamReader entrada = new InputStreamReader(socket_in);
-			BufferedReader leitura = new BufferedReader(entrada);
+			InputStreamReader input = new InputStreamReader(inputStream);
+			BufferedReader buffer = new BufferedReader(input);
 			long RTT_time = 0;
-			String fileName = "RTT\n";
+			String flag = "RTT\n";
 			long initialTime;
 
 			System.out.println("Cliente: trying to get rtt");
 			while (true) {
 
-				fileName = "RTT\n";
+				flag = "RTT\n";
 				initialTime = System.nanoTime();
-				// ENVIA
-				socket_out.write(fileName.getBytes());
-				socket_out.flush();
-				// RECEBE
-				while (!leitura.ready() && flagThread == 0);
-				if (leitura.ready()) {
-					if (leitura.readLine().equals("RTT")) {
-						;
+			
+				outputStream.write(flag.getBytes());
+				outputStream.flush();
+				
+				while (!buffer.ready() && auxThread == 0);
+				if (buffer.ready()) {
+					if (buffer.readLine().equals("RTT")) {
+
 						RTT_time = System.nanoTime() - initialTime;
 					}
 				}
-				fileName = "RTT2\n";
-				// ENVIA
-				if (flagThread == 1) {
+
+				flag = "RTT2\n";
+			
+				if (auxThread == 1) {
 					break;
 				}
-				socket_out.write(fileName.getBytes());
-				socket_out.flush();
+				outputStream.write(flag.getBytes());
+				outputStream.flush();
 
 				double RTT_micro = RTT_time / 1000;
 
-				RTT_text.setText(String.valueOf(RTT_micro));
+				showRTT.setText(String.valueOf(RTT_micro));
 
-				if (flagThread == 1) {
+				if (auxThread == 1) {
 					break;
 				}
 
 				Thread.sleep(1000);
-				if (flagThread == 1) {
-					break;
+
+				if (auxThread == 1) {
+
 				}
 
 			}
-			socket_in.close();
-			socket_out.close();
+
+			inputStream.close();
+			outputStream.close();
+
 			socket.close();
 
 		} catch (IOException e) {

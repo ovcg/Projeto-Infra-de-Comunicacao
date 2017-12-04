@@ -48,18 +48,18 @@ public class Server implements Runnable {
 		DataInputStream data = null;
 		FileOutputStream fileOutput = null;
 
-		byte prosseguir = 1;// sinal para continuar a receber os dados
-		byte[] buffer = new byte[5000];// tam do pacote
-		int bytesLidos = 0;// bytes lidos
-		long tamArq = 0;// recebe tam do arquivo
-		long arqRecebido = 0;// variavel para calcular a porcentagem na progressbar
-		long tempoInicial = 0;
-		long atualizaTempo = 0;
-		long duracao = 0;
-		double vel = 0;
-		double tempoRestante = 0;
-
 		try {
+			byte prosseguir = 1;// sinal para continuar a receber os dados
+			byte[] buffer = new byte[5000];// tam do pacote
+			int bytesLidos = 0;// bytes lidos
+			long tamArq = 0;// recebe tam do arquivo
+			long arqRecebido = 0;// variavel para calcular a porcentagem na progressbar
+			long tempoInicial = 0;
+			long atualizaTempo = 0;
+			long duracao = 0;
+			double vel = 0;
+			double tempoRestante = 0;
+
 			server = new ServerSocket(porta);
 			System.out.println("Escutando na porta: " + server.getLocalPort());
 			Socket socket = server.accept();
@@ -71,14 +71,14 @@ public class Server implements Runnable {
 			RTTRecebendo rtt = new RTTRecebendo(rttRec);
 			Thread t = new Thread(rtt);
 			t.start();
-			rtt.setStop(0);;
+			rtt.setAux(0);
 
 			// Nome do arquivo
 			byte[] nomeArq = new byte[150];
 			input.read(nomeArq);
 
 			String nome = new String(nomeArq, StandardCharsets.UTF_16);
-			nome=formataString(nome);
+			nome = formataString(nome);
 			output.write(prosseguir);
 
 			System.out.println("Recebendo arquivo: " + nome);
@@ -95,14 +95,14 @@ public class Server implements Runnable {
 			tempoInicial = System.currentTimeMillis();
 			atualizaTempo = tempoInicial;
 
-			/*
-			 * // Recebendo tamanho do arquivo byte[] aux = new byte[Long.BYTES];
-			 * input.read(aux); ByteBuffer bufferTam = ByteBuffer.wrap(aux); tamArq =
-			 * bufferTam.getLong(); output.write(prosseguir);
-			 * 
-			 * System.out.println("Recebendo tamanho do arquivo: " + tamArq / 1000000 +
-			 * " MB");
-			 */
+			// Recebendo tamanho do arquivo
+			byte[] aux = new byte[Long.BYTES];
+			input.read(aux);
+			ByteBuffer bufferTam = ByteBuffer.wrap(aux);
+			tamArq = bufferTam.getLong();
+			output.write(prosseguir);
+
+			System.out.println("Recebendo tamanho do arquivo: " + tamArq / 1000000 + " MB");
 
 			File arquivo = new File("Recebidos" + File.separator + nome);
 			fileOutput = new FileOutputStream(arquivo);
@@ -137,6 +137,8 @@ public class Server implements Runnable {
 
 			rtt.setStop(1);
 			tempoEstimado.setText("" + 0);
+			rtt.setAux(1);
+			rtt.setRTT("0");
 			fileOutput.close();
 			data.close();
 			socket.close();

@@ -76,7 +76,8 @@ public class Cliente implements Runnable {
 			RTTEnviando rtt = new RTTEnviando(ip, rttEnv);
 			Thread t = new Thread(rtt);
 			t.start();
-			rtt.setStop(0);;
+			rtt.setAux(0);
+	
 
 			if (enviar == 1) {
 
@@ -93,15 +94,15 @@ public class Cliente implements Runnable {
 				outputStream.write(ipEnv.getBytes("UTF_16"));
 				inputStream.read();
 
-				System.out.println("Cliente enviando IP: "+ipEnv);
+				System.out.println("Cliente enviando IP: " + ipEnv);
 
-				// System.out.println("Cliente enviando tamanho do arquivo: " + tamArq / mega +
-				// " MB");
-				/*
-				 * // Envia tamanho do arquivo ByteBuffer bufferTam =
-				 * ByteBuffer.allocate(Long.BYTES); bufferTam.putLong(tamArq);
-				 * outputStream.write(bufferTam.array(), 0, Long.BYTES); inputStream.read();
-				 */
+				System.out.println("Cliente enviando tamanho do arquivo: " + tamArq / mega + " MB");
+
+				// Envia tamanho do arquivo
+				ByteBuffer bufferTam = ByteBuffer.allocate(Long.BYTES);
+				bufferTam.putLong(tamArq);
+				outputStream.write(bufferTam.array(), 0, Long.BYTES);
+				inputStream.read();
 
 				fileInput = new FileInputStream(file);
 				out = new DataOutputStream(outputStream);
@@ -132,11 +133,10 @@ public class Cliente implements Runnable {
 				}
 
 			}
-
 			tempoEstimado.setText("" + 0);
 			enviar = 0;
-
-			rtt.setStop(1);;
+			rtt.setAux(1);
+			rtt.setRTT("0");
 			inputStream.close();
 			outputStream.close();
 			fileInput.close();

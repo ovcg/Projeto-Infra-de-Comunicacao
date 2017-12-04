@@ -11,70 +11,72 @@ import java.net.Socket;
 import javax.swing.JTextPane;
 
 public class RTTRecebendo implements Runnable {
-	private JTextPane RTT_text;
-	private int flagThread = 0;
 
-	public RTTRecebendo(JTextPane RTT_text) {
-		this.RTT_text = RTT_text;
+	private JTextPane showRTT;
+	private int auxThread = 0;
+
+	public RTTRecebendo(JTextPane showRTT) {
+		this.showRTT = showRTT;
 	}
 
-	public void setStop(int i) {
-		this.flagThread = i;
+	public void setAux(int auxThread) {
+		this.auxThread = auxThread;
+	}
+	public void setRTT(String t) {
+		this.showRTT.setText(t);
 	}
 
 	public void run() {
-		OutputStream socket_out = null;
-		InputStream socket_in = null;
+		OutputStream outputStream = null;
+		InputStream inputStream = null;
 		Socket socket = null;
-		ServerSocket socket_server = null;
+		ServerSocket serverSocket = null;
 		try {
-			socket_server = new ServerSocket(3274);
-			socket = socket_server.accept();
+			serverSocket = new ServerSocket(3274);
+			socket = serverSocket.accept();
 
-			socket_out = socket.getOutputStream();
-			socket_in = socket.getInputStream();
+			outputStream = socket.getOutputStream();
+			inputStream = socket.getInputStream();
 
-			InputStreamReader entrada = new InputStreamReader(socket_in);
-			BufferedReader leitura = new BufferedReader(entrada);
-			long RTT_time = 0;
-			String fileName = "RTT\n";
-			long initialTime;
+			InputStreamReader entrada = new InputStreamReader(inputStream);
 
 			while (true) {
-				// RECEBE
-				while (!leitura.ready() && flagThread == 0)
-					;
+
+				while (!leitura.ready() && auxThread == 0);
 				if (leitura.ready())
 					leitura.readLine();
 				initialTime = System.nanoTime();
-				if (flagThread == 1) {
+
+				if (auxThread == 1) {
 					break;
 				}
-				// ENVIA
-				socket_out.write(fileName.getBytes());
-				socket_out.flush();
-				// RECEBE
-				while (!leitura.ready() && flagThread == 0);
+				
+				outputStream.write(fileName.getBytes());
+				outputStream.flush();
+			
+				while (!leitura.ready() && auxThread == 0);
 				if (leitura.ready()) {
 					if (leitura.readLine().equals("RTT2")) {
 						RTT_time = System.nanoTime() - initialTime;
 
 					}
 				}
-				double RTT_micro = RTT_time / 1000;
-				RTT_text.setText(String.valueOf(RTT_micro));
+				double rtt_ms = rtt_ms / 1000000;
 
-				if (flagThread == 1) {
+				showRTT.setText(String.valueOf(rtt_ms));
+
+				if (auxThread == 1) {
 					break;
 				}
 				Thread.sleep(1000);
-				if (flagThread == 1) {
+				if (auxThread == 1) {
 					break;
 				}
 
 			}
-			socket_in.close();
-			socket_out.close();
+
+			inputStream.close();
+			outputStream.close();
 			socket.close();
 			socket_server.close();
 
