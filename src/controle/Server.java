@@ -88,7 +88,7 @@ public class Server implements Runnable {
 
 			String ipRec = new String(ipRecebido, StandardCharsets.UTF_16);
 			ipRec = formataString(ipRec);
-			lblIp.setText(ipRec);
+			lblIp.setText("IP: "+ipRec);
 			output.write(prosseguir);
 
 			tempoInicial = System.currentTimeMillis();

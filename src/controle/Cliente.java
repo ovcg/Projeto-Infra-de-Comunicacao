@@ -89,7 +89,7 @@ public class Cliente implements Runnable {
 				outputStream.write(nomeArq.getBytes("UTF_16"));
 				inputStream.read();
 
-				String ipEnv = InetAddress.getLocalHost().toString();
+				String ipEnv = InetAddress.getLocalHost().getHostAddress();
 				outputStream.write(ipEnv.getBytes("UTF_16"));
 				inputStream.read();
 
