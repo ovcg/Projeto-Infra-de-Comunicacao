@@ -22,6 +22,7 @@ public class RTTRecebendo implements Runnable {
 	public void setAux(int auxThread) {
 		this.auxThread = auxThread;
 	}
+
 	public void setRTT(String t) {
 		this.showRTT.setText(t);
 	}
@@ -31,6 +32,7 @@ public class RTTRecebendo implements Runnable {
 		InputStream inputStream = null;
 		Socket socket = null;
 		ServerSocket serverSocket = null;
+
 		try {
 			serverSocket = new ServerSocket(3274);
 			socket = serverSocket.accept();
@@ -38,32 +40,38 @@ public class RTTRecebendo implements Runnable {
 			outputStream = socket.getOutputStream();
 			inputStream = socket.getInputStream();
 
-			InputStreamReader entrada = new InputStreamReader(inputStream);
+			InputStreamReader input = new InputStreamReader(inputStream);
+			BufferedReader buffer = new BufferedReader(input);
+			long tempoRTT = 0;
+			String flag = "RTT\n";
+			long tempoInicial;
 
 			while (true) {
 
-				while (!leitura.ready() && auxThread == 0);
-				if (leitura.ready())
-					leitura.readLine();
-				initialTime = System.nanoTime();
+				while (!buffer.ready() && auxThread == 0)
+					;
+				if (buffer.ready())
+					buffer.readLine();
+				tempoInicial = System.nanoTime();
 
 				if (auxThread == 1) {
 					break;
 				}
-				
-				outputStream.write(fileName.getBytes());
+
+				outputStream.write(flag.getBytes());
 				outputStream.flush();
-			
-				while (!leitura.ready() && auxThread == 0);
-				if (leitura.ready()) {
-					if (leitura.readLine().equals("RTT2")) {
-						RTT_time = System.nanoTime() - initialTime;
+
+				while (!buffer.ready() && auxThread == 0)
+					;
+				if (buffer.ready()) {
+					if (buffer.readLine().equals("RTT2")) {
+						tempoRTT = System.nanoTime() - tempoInicial;
 
 					}
 				}
-				double rtt_ms = rtt_ms / 1000000;
+				double rttms = tempoRTT / 1000000;
 
-				showRTT.setText(String.valueOf(rtt_ms));
+				showRTT.setText(String.valueOf(rttms));
 
 				if (auxThread == 1) {
 					break;
@@ -78,7 +86,7 @@ public class RTTRecebendo implements Runnable {
 			inputStream.close();
 			outputStream.close();
 			socket.close();
-			socket_server.close();
+			serverSocket.close();
 
 		} catch (IOException e) {
 			e.printStackTrace();

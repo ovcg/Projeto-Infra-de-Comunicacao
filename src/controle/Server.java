@@ -135,7 +135,7 @@ public class Server implements Runnable {
 
 			}
 
-			rtt.setStop(1);
+			
 			tempoEstimado.setText("" + 0);
 			rtt.setAux(1);
 			rtt.setRTT("0");
