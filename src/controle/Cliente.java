@@ -137,12 +137,13 @@ public class Cliente implements Runnable {
 			enviar = 0;
 			rtt.setAux(1);
 			rtt.setRTT("0");
+			
 			inputStream.close();
 			outputStream.close();
 			fileInput.close();
-			out.close();
+			out.close();			
 			socket.close();
-
+			
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
