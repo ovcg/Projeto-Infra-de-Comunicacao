@@ -41,88 +41,94 @@ public class Server implements Runnable {
 
 	}
 
+			
 	@Override
 	public void run() {
 		InputStream input = null;
 		OutputStream output = null;
-		DataInputStream data = null;
+		DataInputStream data=null;
 		FileOutputStream fileOutput = null;
+		
 
+		byte prosseguir = 1;//sinal para continuar a receber os dados
+		byte[] buffer = new byte[5000];//tam do pacote
+		int bytesLidos = 0;//bytes lidos 
+		long tamArq = 0;//recebe tam do arquivo
+		long arqRecebido = 0;//variavel para calcular a porcentagem na progressbar
+		long tempoInicial=0;
+		long atualizaTempo=0;
+		long duracao=0;
+		double vel=0;
+		double tempoRestante=0;
+		
+		
 		try {
-			byte prosseguir = 1;// sinal para continuar a receber os dados
-			byte[] buffer = new byte[5000];// tam do pacote
-			int bytesLidos = 0;// bytes lidos
-			long tamArq = 0;// recebe tam do arquivo
-			long arqRecebido = 0;// variavel para calcular a porcentagem na progressbar
-			long tempoInicial = 0;
-			long atualizaTempo = 0;
-			long duracao = 0;
-			double vel = 0;
-			double tempoRestante = 0;
-
-			server = new ServerSocket(porta);
-			System.out.println("Escutando na porta: " + server.getLocalPort());
+			server=new ServerSocket(porta);
+			System.out.println("Escutando na porta: "+server.getLocalPort());	
 			Socket socket = server.accept();
 
 			input = socket.getInputStream();
-			output = socket.getOutputStream();
+			output=socket.getOutputStream();
 			output.write(prosseguir);
 
-			RTTRecebendo rtt = new RTTRecebendo(rttRec);
-			Thread t = new Thread(rtt);
+			RTTRecebendo rtt=new RTTRecebendo(rttRec);
+			Thread t=new Thread(rtt);
 			t.start();
 			rtt.setAux(0);
+			
 
 			// Nome do arquivo
 			byte[] nomeArq = new byte[150];
 			input.read(nomeArq);
 
 			String nome = new String(nomeArq, StandardCharsets.UTF_16);
-			nome = formataString(nome);
-			output.write(prosseguir);
-
+			
+			int position=nome.indexOf(0);
+			if(position!=-1) {
+				nome=nome.substring(0,position);
+			}
 			System.out.println("Recebendo arquivo: " + nome);
 			output.write(prosseguir);
-
-			byte[] ipRecebido = new byte[150];
+			
+			tempoInicial=System.currentTimeMillis();
+			atualizaTempo=tempoInicial;
+			
+			byte[] ipRecebido=new byte[150];
 			input.read(ipRecebido);
-
+			
 			String ipRec = new String(ipRecebido, StandardCharsets.UTF_16);
 			ipRec = formataString(ipRec);
 			lblIp.setText(ipRec);
 			output.write(prosseguir);
-
-			tempoInicial = System.currentTimeMillis();
-			atualizaTempo = tempoInicial;
-
+			
 			// Recebendo tamanho do arquivo
 			byte[] aux = new byte[Long.BYTES];
 			input.read(aux);
 			ByteBuffer bufferTam = ByteBuffer.wrap(aux);
 			tamArq = bufferTam.getLong();
 			output.write(prosseguir);
+			
+			System.out.println("Recebendo tamanho do arquivo: " + tamArq/1000000+" MB");
 
-			System.out.println("Recebendo tamanho do arquivo: " + tamArq / 1000000 + " MB");
-
-			File arquivo = new File("Recebidos" + File.separator + nome);
+			File arquivo = new File("Recebidos"+File.separator+nome);
 			fileOutput = new FileOutputStream(arquivo);
-			data = new DataInputStream(input);
+			data=new DataInputStream(input); 
 
-			while ((bytesLidos = data.read(buffer)) > 0) {// Recebendo o arquivo
-
+			while ((bytesLidos = data.read(buffer)) >0) {// Recebendo o arquivo
+				
 				fileOutput.write(buffer, 0, bytesLidos);
 				fileOutput.flush();
-
-				arqRecebido += bytesLidos;
-
+				
+				arqRecebido+=bytesLidos;
+				
 				// Atualizando ProgessBar
-
-				progressBar.setValue((int) ((arqRecebido * 100) / tamArq));
+				
+				progressBar.setValue((int)((arqRecebido * 100) / tamArq));
 				progressBar.setString(Long.toString((arqRecebido * 100) / tamArq) + " %");
 				progressBar.setStringPainted(true);
-
-				if (arqRecebido > 10000 && (System.currentTimeMillis() - atualizaTempo) > 1000) {
-
+				
+				if(arqRecebido>10000 && (System.currentTimeMillis()-atualizaTempo)>1000) {
+					
 					duracao = System.currentTimeMillis() - tempoInicial;
 					long div = arqRecebido / duracao;
 					vel = div * 1000;
@@ -132,11 +138,12 @@ public class Server implements Runnable {
 					tempoEstimado.setText(auxDec);
 					atualizaTempo = System.currentTimeMillis();
 				}
-
+				
 			}
+			
 
 			tempoEstimado.setText("" + 0);
-			rtt.setAux(1);			
+			rtt.setAux(1);
 			rtt.setRTT("0");
 			fileOutput.close();
 			data.close();
