@@ -36,14 +36,13 @@ public class Main extends JFrame {
 	private JButton buttonParar;
 	private JButton buttonReiniciar;
 	private JButton buttonCancelar;
-	private JTextPane textPaneRTTRec;
-	private JTextPane textPaneRTTEnv;
+	private JTextPane textFieldRTTRec;
+	private JTextPane rttEnv;
+	private JTextPane rttRec;
 	private JTextField textFieldTempoEnv;
 	private JTextField textFieldTempoRec;
 	private JProgressBar progressBarRecebendo;
 	private JProgressBar progressBar;	
-	private Cliente cliente;
-	private Server server;
 	private String path;
 	private String nomeArquivo;
 	private File file;
@@ -102,13 +101,13 @@ public class Main extends JFrame {
 		lblTempoEstimado_1.setBounds(48, 297, 124, 15);
 		contentPane.add(lblTempoEstimado_1);
 
-		textPaneRTTRec = new JTextPane();
-		textPaneRTTRec.setBounds(454, 244, 114, 19);
-		contentPane.add(textPaneRTTRec);
+		rttRec = new JTextPane();
+		rttRec.setBounds(454, 244, 114, 19);
+		contentPane.add(rttRec);
 
-		textPaneRTTEnv = new JTextPane();
-		textPaneRTTEnv.setBounds(454, 163, 114, 19);
-		contentPane.add(textPaneRTTEnv);
+		rttEnv = new JTextPane();
+		rttEnv.setBounds(454, 163, 114, 19);
+		contentPane.add(rttEnv);
 
 		textFieldTempoEnv = new JTextField();
 		textFieldTempoEnv.setColumns(10);
@@ -150,7 +149,7 @@ public class Main extends JFrame {
 		contentPane.add(lblPortaDestino);
 
 		lblTamanhoDoArquivo = new JLabel("Tam. do Arquivo:");
-		lblTamanhoDoArquivo.setBounds(52, 109, 522, 15);
+		lblTamanhoDoArquivo.setBounds(48, 102, 522, 15);
 		contentPane.add(lblTamanhoDoArquivo);
 
 		JLabel lblEnviando = new JLabel("Enviando:");
@@ -169,10 +168,7 @@ public class Main extends JFrame {
 		btnEscutar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int porta = Integer.parseInt(textFieldPort.getText());
-				server = new Server(porta, progressBarRecebendo, textFieldRTTRec, textFieldTempoRec);
-
-				int porta=Integer.parseInt(textFieldPort.getText());
-				server=new Server(porta,progressBarRecebendo,textPaneRTTRec,textFieldTempoRec,lblIp);
+				server = new Server(porta, progressBarRecebendo, textFieldRTTRec, textFieldTempoRec,lblIp);
 
 				Thread serverThread = new Thread(server);
 				serverThread.start();
@@ -207,17 +203,15 @@ public class Main extends JFrame {
 			public void actionPerformed(ActionEvent arg0) {
 
 				String ip = textFieldIp.getText();
+				int porta = Integer.parseInt(textFieldPort.getText());
 				if(ip==null||ip.equalsIgnoreCase("")||ip.length()<6) {
 					JOptionPane.showMessageDialog(null,"Campo ip com erro!");
-				}
-				if(textFieldPort==null) {
-					JOptionPane.showMessageDialog(null,"Campo porta com erro!");
-				}
-				int porta = Integer.parseInt(textFieldPort.getText());
-        else {
+				}				
+				
+				else {
 
 					enviar = 1;
-					cliente = new Cliente(ip, porta, nomeArquivo, path, enviar, progressBar, textFieldRTTEnv,
+					cliente = new Cliente(ip, porta, nomeArquivo, path, enviar, progressBar, rttEnv,
 							textFieldTempoEnv);
 					Thread t = new Thread(cliente);
 					t.start();
@@ -244,7 +238,8 @@ public class Main extends JFrame {
   
 		buttonReiniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
-				reiniciar=1;
+				cliente.reiniciar(1);
+				JOptionPane.showConfirmDialog(null, "Transferência reiniciada!");
 			}
 		});
 
