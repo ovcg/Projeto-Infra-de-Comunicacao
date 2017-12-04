@@ -76,7 +76,7 @@ public class Cliente implements Runnable {
 			RTTEnviando rtt = new RTTEnviando(ip, rttEnv);
 			Thread t = new Thread(rtt);
 			t.start();
-			rtt.setAuxThread(false);
+			rtt.setStop(0);;
 
 			if (enviar == 1) {
 
@@ -136,7 +136,7 @@ public class Cliente implements Runnable {
 			tempoEstimado.setText("" + 0);
 			enviar = 0;
 
-			rtt.setAuxThread(true);
+			rtt.setStop(1);;
 			inputStream.close();
 			outputStream.close();
 			fileInput.close();

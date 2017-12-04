@@ -9,85 +9,82 @@ import java.net.Socket;
 
 import javax.swing.JTextPane;
 
-//Classe para calcular o RTT
 public class RTTEnviando implements Runnable {
+	private String ip_text;
+	private JTextPane RTT_text;
+	private int flagThread = 0;
 
-	private boolean auxThread;
-	private String ip;
-	private JTextPane rttEnviando;
-
-	public RTTEnviando(String ip, JTextPane rttEnv) {
-		this.ip = ip;
-		this.rttEnviando = rttEnv;
+	public RTTEnviando(String IP, JTextPane RTT_text) {
+		ip_text = IP;
+		this.RTT_text = RTT_text;
 	}
 
-	public void setAuxThread(boolean aux) {
-		this.auxThread = aux;
+	public void setStop(int i) {
+		this.flagThread = i;
 	}
 
-	@Override
 	public void run() {
-		long tempoRTT = 0;
-		long tempoInicial = 0;
-		String nome = "rtt1\n";
-		InputStream inputStream = null;
-		OutputStream outputStream = null;
-
+		OutputStream socket_out = null;
+		InputStream socket_in = null;
+		Socket socket = null;
 		try {
-			Socket socket = new Socket(ip, 3300);
-			inputStream = socket.getInputStream();
-			outputStream = socket.getOutputStream();
+			socket = new Socket(ip_text, 3274);
 
-			InputStreamReader input = new InputStreamReader(inputStream);
-			BufferedReader buffer = new BufferedReader(input);
+			socket_out = socket.getOutputStream();
+			socket_in = socket.getInputStream();
 
+			InputStreamReader entrada = new InputStreamReader(socket_in);
+			BufferedReader leitura = new BufferedReader(entrada);
+			long RTT_time = 0;
+			String fileName = "RTT\n";
+			long initialTime;
+
+			System.out.println("Cliente: trying to get rtt");
 			while (true) {
 
-				tempoInicial = System.nanoTime();
-				outputStream.write(nome.getBytes());
-				outputStream.flush();
-
-				while (auxThread == false && !buffer.ready())
-					;
-
-				if (buffer.ready()) {
-					if (buffer.readLine().equals("rtt1")) {
-						tempoRTT = System.nanoTime() - tempoInicial;
-
+				fileName = "RTT\n";
+				initialTime = System.nanoTime();
+				// ENVIA
+				socket_out.write(fileName.getBytes());
+				socket_out.flush();
+				// RECEBE
+				while (!leitura.ready() && flagThread == 0);
+				if (leitura.ready()) {
+					if (leitura.readLine().equals("RTT")) {
+						;
+						RTT_time = System.nanoTime() - initialTime;
 					}
 				}
-
-				nome = "rtt";
-				if (auxThread == true) {
+				fileName = "RTT2\n";
+				// ENVIA
+				if (flagThread == 1) {
 					break;
 				}
-				outputStream.write(nome.getBytes());
-				outputStream.flush();
+				socket_out.write(fileName.getBytes());
+				socket_out.flush();
 
-				String rttAtual = "" + tempoRTT / 1000000;
-				rttEnviando.setText(rttAtual);
+				double RTT_micro = RTT_time / 1000;
 
-				if (auxThread == true) {
+				RTT_text.setText(String.valueOf(RTT_micro));
+
+				if (flagThread == 1) {
 					break;
 				}
+
 				Thread.sleep(1000);
-				if (auxThread == true) {
+				if (flagThread == 1) {
 					break;
 				}
 
 			}
-
-			inputStream.close();
-			outputStream.close();
+			socket_in.close();
+			socket_out.close();
 			socket.close();
 
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 	}
 }

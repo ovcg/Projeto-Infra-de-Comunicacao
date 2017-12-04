@@ -71,7 +71,7 @@ public class Server implements Runnable {
 			RTTRecebendo rtt = new RTTRecebendo(rttRec);
 			Thread t = new Thread(rtt);
 			t.start();
-			rtt.setAuxThread(false);
+			rtt.setStop(0);;
 
 			// Nome do arquivo
 			byte[] nomeArq = new byte[150];
@@ -89,7 +89,7 @@ public class Server implements Runnable {
 
 			String ipRec = new String(ipRecebido, StandardCharsets.UTF_16);
 			ipRec = formataString(ipRec);
-			lblIp.setText("IP: "+ipRec);
+			lblIp.setText(ipRec);
 			output.write(prosseguir);
 
 			tempoInicial = System.currentTimeMillis();
@@ -135,6 +135,7 @@ public class Server implements Runnable {
 
 			}
 
+			rtt.setStop(1);
 			tempoEstimado.setText("" + 0);
 			fileOutput.close();
 			data.close();
