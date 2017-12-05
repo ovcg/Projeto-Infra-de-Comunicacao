@@ -92,7 +92,7 @@ public class Server implements Runnable {
 
 			String ipRec = new String(ipRecebido, StandardCharsets.UTF_16);
 			ipRec = formataString(ipRec);
-			lblIp.setText("IP fonte:" + ipRec);
+			lblIp.setText("IP fonte: " + ipRec);
 			output.write(prosseguir);
 
 			// Recebendo tamanho do arquivo
@@ -122,12 +122,11 @@ public class Server implements Runnable {
 					
 					try {
 						
-						Thread.sleep(5000);
 						fileOutput.close();
 						data.close();
 						socket.close();
 						server.close();
-						
+						Thread.sleep(1000);
 					} catch (InterruptedException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();

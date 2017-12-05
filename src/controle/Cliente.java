@@ -103,6 +103,9 @@ public class Cliente implements Runnable {
 				outputStream.write(bufferTam.array(), 0, Long.BYTES);
 				inputStream.read();
 
+				tempoInicial = System.currentTimeMillis();
+				atualizaTempo = tempoInicial;
+
 				fileInput = new FileInputStream(file);
 				out = new DataOutputStream(outputStream);
 
@@ -119,15 +122,33 @@ public class Cliente implements Runnable {
 							progressbar.setValue(0);
 							progressbar.setString(0 + " %");
 							progressbar.setStringPainted(true);
-							Thread.sleep(5000);
-							
+							Thread.sleep(1000);
+
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
-						
 
-					} else {
+					} else if (parar == 1) {
+						System.out.println("Parando transferência!");
+						tempoEstimado.setText("Pause");
+						rtt.setRTT("0");
+
+						while (parar == 1 && enviar == 0) {
+
+							System.out.println("Transferência parada!");
+						}
+						if (parar == 0 && enviar == 1) {
+							break;
+
+						}
+
+					} else if (enviar == 1 && reiniciar == 1 && cancelar==0 && parar ==0) {
+
+						
+					}
+
+					else {
 						out.write(buffer, 0, bytesLidos);
 						out.flush();
 						arqEnviado += bytesLidos;
@@ -139,15 +160,12 @@ public class Cliente implements Runnable {
 
 						if (arqEnviado > 10000 && (System.currentTimeMillis() - atualizaTempo) > 1000) {
 							duracao = System.currentTimeMillis() - tempoInicial;
-							long div = arqEnviado / duracao;
-							vel = div * 1000;
+							vel = 1000 * (arqEnviado / duracao);
 							tempoRestante = (tamArq - arqEnviado) / vel;
-							DecimalFormat dec = new DecimalFormat("#");
-							String auxDec = "" + dec.format(tempoRestante);
-							tempoEstimado.setText(auxDec);
+							tempoEstimado.setText(String.valueOf(new DecimalFormat("#").format(tempoRestante)));
 							atualizaTempo = System.currentTimeMillis();
-
 						}
+
 					}
 
 				}
@@ -168,6 +186,10 @@ public class Cliente implements Runnable {
 			e1.printStackTrace();
 		}
 
+	}
+
+	public void iniciar(int enviar) {
+		this.enviar = enviar;
 	}
 
 	public void pararEnvio(int parar) {
