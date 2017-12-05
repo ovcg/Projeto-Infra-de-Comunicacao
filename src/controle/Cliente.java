@@ -112,6 +112,7 @@ public class Cliente implements Runnable {
 				while ((bytesLidos = fileInput.read(buffer)) > 0) {// Enviando arquivo
 
 					if (cancelar == 1) {
+						
 						try {
 							out.write(bufferCancelar, 0, 0);
 							out.flush();
@@ -132,11 +133,9 @@ public class Cliente implements Runnable {
 					} else if (parar == 1) {
 						System.out.println("Parando transferência!");
 						tempoEstimado.setText("Pause");
-						rtt.setRTT("0");
 
 						while (parar == 1 && enviar == 0) {
-
-							System.out.println("Transferência parada!");
+							rtt.setRTT("0.0");
 						}
 						if (parar == 0 && enviar == 1) {
 							break;

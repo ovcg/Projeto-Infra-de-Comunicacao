@@ -113,15 +113,14 @@ public class Server implements Runnable {
 				if (buffer == bufferCancel && bytesLidos == 0) {
 
 					progressBar.setValue(0);
-					progressBar.setString("0"+ " %");
+					progressBar.setString("0" + " %");
 					progressBar.setStringPainted(true);
 					tempoEstimado.setText("" + 0);
 					rtt.setAux(1);
 					rtt.setRTT("0");
-					
-					
+
 					try {
-						
+
 						fileOutput.close();
 						data.close();
 						socket.close();
