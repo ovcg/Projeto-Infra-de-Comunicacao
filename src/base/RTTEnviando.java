@@ -44,7 +44,7 @@ public class RTTEnviando implements Runnable {
 			String flag = "RTT\n";
 			long initialTime;
 
-			System.out.println("Conectando-se...");
+			System.out.println("Conectando-se para obter RTT...");
 			while (true) {
 
 				flag = "RTT\n";

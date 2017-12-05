@@ -41,7 +41,7 @@ public class Main extends JFrame {
 	private JTextField textFieldTempoEnv;
 	private JTextField textFieldTempoRec;
 	private JProgressBar progressBarRecebendo;
-	private JProgressBar progressBar;	
+	private JProgressBar progressBar;
 	private String path;
 	private String nomeArquivo;
 	private File file;
@@ -163,7 +163,6 @@ public class Main extends JFrame {
 		lblTempoEstimado.setBounds(48, 197, 136, 15);
 		contentPane.add(lblTempoEstimado);
 
-
 		JLabel label_2 = new JLabel("ms");
 		label_2.setBounds(572, 244, 70, 15);
 		contentPane.add(label_2);
@@ -171,16 +170,16 @@ public class Main extends JFrame {
 		JLabel label_4 = new JLabel("ms");
 		label_4.setBounds(572, 165, 70, 15);
 		contentPane.add(label_4);
-		
+
 		lblIp = new JLabel("IP:");
 		lblIp.setBounds(48, 129, 353, 15);
 		contentPane.add(lblIp);
-		
+
 		JButton btnEscutar = new JButton("Escutar");
 		btnEscutar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				int porta = Integer.parseInt(textFieldPort.getText());
-				server = new Server(porta, progressBarRecebendo, rttRec, textFieldTempoRec,lblIp);
+				server = new Server(porta, progressBarRecebendo, rttRec, textFieldTempoRec, lblIp);
 
 				Thread serverThread = new Thread(server);
 				serverThread.start();
@@ -216,17 +215,23 @@ public class Main extends JFrame {
 
 				String ip = textFieldIp.getText();
 				int porta = Integer.parseInt(textFieldPort.getText());
-				if(ip==null||ip.equalsIgnoreCase("")||ip.length()<6) {
-					JOptionPane.showMessageDialog(null,"Campo ip com erro!");
-				}				
-				
-				else {
+			
+				if (ip == null || ip.equalsIgnoreCase("") || ip.length() < 6) {
+					JOptionPane.showMessageDialog(null, "Campo ip com erro!");
+				}
 
-					enviar = 1;
-					cliente = new Cliente(ip, porta, nomeArquivo, path, enviar, progressBar, rttEnv,
-							textFieldTempoEnv);
-					Thread t = new Thread(cliente);
-					t.start();
+				else {
+					if (enviar == 0) {
+						enviar = 1;
+						cliente = new Cliente(ip, porta, nomeArquivo, path, enviar, progressBar, rttEnv,
+								textFieldTempoEnv);
+						Thread t = new Thread(cliente);
+						t.start();
+					}
+					else {
+						enviar=1;
+						cliente.pararEnvio(0);
+					}
 				}
 
 			}
@@ -238,7 +243,8 @@ public class Main extends JFrame {
 		buttonParar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				cliente.pararEnvio(1);
-				JOptionPane.showConfirmDialog(null, "Transferência parada!");
+				cliente.iniciar(0);
+				JOptionPane.showMessageDialog(null, "Transferência parada!");
 			}
 		});
 		buttonParar.setBounds(202, 357, 117, 25);
@@ -247,11 +253,11 @@ public class Main extends JFrame {
 		buttonReiniciar = new JButton("Reiniciar");// botão para recomecar transferencia
 		buttonReiniciar.setBounds(497, 357, 117, 25);
 		contentPane.add(buttonReiniciar);
-  
+
 		buttonReiniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				cliente.reiniciar(1);
-				JOptionPane.showConfirmDialog(null, "Transferência reiniciada!");
+				JOptionPane.showMessageDialog(null, "Transferência reiniciada!");
 			}
 		});
 
@@ -265,7 +271,6 @@ public class Main extends JFrame {
 		});
 		buttonCancelar.setBounds(352, 357, 117, 25);
 		contentPane.add(buttonCancelar);
-
 
 	}
 }
