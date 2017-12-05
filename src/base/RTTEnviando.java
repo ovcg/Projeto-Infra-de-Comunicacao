@@ -40,15 +40,15 @@ public class RTTEnviando implements Runnable {
 
 			InputStreamReader input = new InputStreamReader(inputStream);
 			BufferedReader buffer = new BufferedReader(input);
-			long RTT_time = 0;
+			long tempoRTT = 0;
 			String flag = "RTT\n";
-			long initialTime;
+			long tempoInicial;
 
 			System.out.println("Conectando-se para obter RTT...");
 			while (true) {
 
 				flag = "RTT\n";
-				initialTime = System.nanoTime();
+				tempoInicial = System.nanoTime();
 			
 				outputStream.write(flag.getBytes());
 				outputStream.flush();
@@ -57,7 +57,7 @@ public class RTTEnviando implements Runnable {
 				if (buffer.ready()) {
 					if (buffer.readLine().equals("RTT")) {
 
-						RTT_time = System.nanoTime() - initialTime;
+						tempoRTT = System.nanoTime() - tempoInicial;
 					}
 				}
 
@@ -69,9 +69,9 @@ public class RTTEnviando implements Runnable {
 				outputStream.write(flag.getBytes());
 				outputStream.flush();
 
-				double RTT_micro = RTT_time / 1000;
+				double rttms = tempoRTT / 1000000;
 
-				showRTT.setText(String.valueOf(RTT_micro));
+				showRTT.setText(String.valueOf(rttms));
 
 				if (auxThread == 1) {
 					break;
