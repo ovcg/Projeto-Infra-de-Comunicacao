@@ -264,6 +264,7 @@ public class Main extends JFrame {
 
 		buttonCancelar = new JButton("Cancelar");// botão para cancelar
 		buttonCancelar.addActionListener(new ActionListener() {
+			@SuppressWarnings("deprecation")
 			public void actionPerformed(ActionEvent arg0) {
 				if(enviar==1) {
 				cliente.cancelarEnvio(1);
