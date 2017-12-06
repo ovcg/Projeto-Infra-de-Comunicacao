@@ -60,6 +60,7 @@ public class Cliente implements Runnable {
 			inputStream.read();
 
 			byte[] buffer = new byte[5000];
+			byte[] bufferCancel = new byte[1024];
 			int bytesLidos = 0;
 			long tamArq = 0;
 			long arqEnviado = 0;
@@ -110,18 +111,19 @@ public class Cliente implements Runnable {
 
 					if (cancelar == 1) {
 						
-						out.write(0);
-						out.flush();
-						tempoEstimado.setText("0");
-						enviar = 0;
-						rtt.setAux(1);
-						rtt.setRTT("0");
-						progressbar.setValue(0);
-						progressbar.setString(0 + " %");
-						progressbar.setStringPainted(true);
-
+						
 						try {
 							System.out.println("Cancelando Transferência...");
+							out.write(0);
+							out.flush();
+							tempoEstimado.setText("0");
+							enviar = 0;
+							rtt.setAux(1);
+							rtt.setRTT("0");
+							progressbar.setValue(0);
+							progressbar.setString(0 + " %");
+							progressbar.setStringPainted(true);
+							
 							Thread.sleep(1000);
 							return;
 						} catch (InterruptedException e) {
