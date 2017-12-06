@@ -7,27 +7,29 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 
-import javax.swing.JTextPane;
+public class EnviarMsg implements Runnable {
 
-public class RTTEnviando implements Runnable {
-
+	private int cancelar = 0;
+	private int reiniciar = 0;
 	private String ip;
-	private JTextPane showRTT;
-	private int auxThread = 0;
+	private String flag;
 
-	public RTTEnviando(String ip, JTextPane showRTT) {
+	public EnviarMsg(String ip) {
 		this.ip = ip;
-		this.showRTT = showRTT;
 	}
 
-	public void setAux(int auxThread) {
-		this.auxThread = auxThread;
+	public void setCancelar(int cancelar) {
+		this.cancelar = cancelar;
 	}
 
-	public void setRTT(String t) {
-		this.showRTT.setText(t);
+	public void setReiniciar(int reiniciar) {
+		this.reiniciar = reiniciar;
+	}
+	public void setFlag(String flag) {
+		this.flag=flag;
 	}
 
+	@Override
 	public void run() {
 		OutputStream outputStream = null;
 		InputStream inputStream = null;
@@ -40,46 +42,43 @@ public class RTTEnviando implements Runnable {
 
 			InputStreamReader input = new InputStreamReader(inputStream);
 			BufferedReader buffer = new BufferedReader(input);
-			long tempoRTT = 0;
 			String flag = "RTT\n";
-			long tempoInicial;
+			
 
-			System.out.println("Conectando-se para obter RTT...");
+			System.out.println("Status da transferência...");
 			while (true) {
 
-				flag = "rtt\n";
-				tempoInicial = System.nanoTime();
+				setFlag("ok\n");
 			
+
 				outputStream.write(flag.getBytes());
 				outputStream.flush();
-				
-				while (!buffer.ready() && auxThread == 0);
-				if (buffer.ready()) {
-					if (buffer.readLine().equals("rtt")) {
 
-						tempoRTT = System.nanoTime() - tempoInicial;
+				while (!buffer.ready() && cancelar == 0 && reiniciar==0)
+					;
+				if (buffer.ready()) {
+					if (buffer.readLine().equals("ok")) {
+						continue;
 					}
 				}
 
-				flag = "rtt2\n";
-			
-				if (auxThread == 1) {
+				setFlag("ok2\n");
+
+				if (cancelar == 1) {
+					setFlag("cancel\n");
 					break;
 				}
+				
 				outputStream.write(flag.getBytes());
 				outputStream.flush();
 
-				double rttms = tempoRTT / 1000000;
-
-				showRTT.setText(String.valueOf(rttms));
-
-				if (auxThread == 1) {
+				if (cancelar == 1) {
 					break;
 				}
 
 				Thread.sleep(1000);
 
-				if (auxThread == 1) {
+				if (cancelar == 1) {
 					break;
 				}
 
@@ -96,4 +95,5 @@ public class RTTEnviando implements Runnable {
 			e.printStackTrace();
 		}
 	}
+
 }
