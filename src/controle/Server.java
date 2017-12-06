@@ -10,6 +10,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.text.DecimalFormat;
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
@@ -157,6 +158,9 @@ public class Server implements Runnable {
 
 					}
 				}
+			if(arqRecebido!=tamArq) {
+				Files.delete(arquivo.toPath());
+			}
 			
 			tempoEstimado.setText("" + 0);
 			rtt.setAux(1);
@@ -169,8 +173,6 @@ public class Server implements Runnable {
 		} catch (IOException e) {
 
 			e.printStackTrace();
-		} finally {
-
 		}
 
 	}
