@@ -69,6 +69,7 @@ public class RTTRecebendo implements Runnable {
 
 					}
 					else if(buffer.readLine().equals("pause")) {
+						while(auxThread==2)
 						showRTT.setText("Pause");
 					}
 				}

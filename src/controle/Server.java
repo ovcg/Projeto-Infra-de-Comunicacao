@@ -108,7 +108,7 @@ public class Server implements Runnable {
 
 			while ((bytesLidos = data.read(buffer)) > 0) {// Recebendo o arquivo
 				
-					if ((bytesLidos = data.read()) == 0) {
+					if (bytesLidos == 0) {
 						System.out.println("Cancelando transferência!");
 						progressBar.setValue(0);
 						progressBar.setString("0" + " %");
