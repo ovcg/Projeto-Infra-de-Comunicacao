@@ -109,7 +109,9 @@ public class Cliente implements Runnable {
 				while ((bytesLidos = fileInput.read(buffer)) > 0) {// Enviando arquivo
 
 					if (cancelar == 1) {
-
+						
+						out.write(0);
+						out.flush();
 						tempoEstimado.setText("0");
 						enviar = 0;
 						rtt.setAux(1);
