@@ -41,7 +41,7 @@ public class RTTEnviando implements Runnable {
 			InputStreamReader input = new InputStreamReader(inputStream);
 			BufferedReader buffer = new BufferedReader(input);
 			long tempoRTT = 0;
-			String flag = "RTT\n";
+			String flag = "rtt\n";
 			long tempoInicial;
 
 			System.out.println("Conectando-se para obter RTT...");
@@ -65,6 +65,12 @@ public class RTTEnviando implements Runnable {
 			
 				if (auxThread == 1) {
 					break;
+				}
+				if(auxThread==2) {
+					flag="pause\n";
+					outputStream.write(flag.getBytes());
+					outputStream.flush();
+					while(auxThread==2)showRTT.setText("Pause");
 				}
 				outputStream.write(flag.getBytes());
 				outputStream.flush();

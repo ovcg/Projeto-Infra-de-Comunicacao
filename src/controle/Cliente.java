@@ -137,6 +137,7 @@ public class Cliente implements Runnable {
 							rtt.setRTT("0.0");
 						}
 						if (parar == 0 && enviar == 1) {
+							rtt.setAux(0);
 							break;
 
 						}
