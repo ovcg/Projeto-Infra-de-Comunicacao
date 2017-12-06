@@ -11,14 +11,12 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
-
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-
 import base.RTTRecebendo;
-import base.ReceberMsg;
+
 
 public class Server implements Runnable {
 
@@ -27,8 +25,6 @@ public class Server implements Runnable {
 	private JProgressBar progressBar;
 	private JTextPane rttRec;
 	private JTextField tempoEstimado;
-
-	private int parar = 0;
 	private int cancelar = 0;
 	private int reiniciar = 0;
 	private JLabel lblIp;
@@ -70,7 +66,6 @@ public class Server implements Runnable {
 			output = socket.getOutputStream();
 			output.write(prosseguir);
 
-			ReceberMsg msg = new ReceberMsg();
 
 			RTTRecebendo rtt = new RTTRecebendo(rttRec);
 			Thread t = new Thread(rtt);
@@ -112,9 +107,9 @@ public class Server implements Runnable {
 			data = new DataInputStream(input);
 
 			while ((bytesLidos = data.read(buffer)) > 0) {// Recebendo o arquivo
-				if (cancelar == 0) {
-					if (msg.getFlag().equalsIgnoreCase("cancel")) {
-						cancelar = 1;
+				
+					if ((bytesLidos = data.read(buffer)) == 0) {
+						System.out.println("Cancelando transferência!");
 						progressBar.setValue(0);
 						progressBar.setString("0" + " %");
 						progressBar.setStringPainted(true);
@@ -161,10 +156,8 @@ public class Server implements Runnable {
 						}
 
 					}
-				}else if(cancelar==1) {
-					
 				}
-			}
+			
 			tempoEstimado.setText("" + 0);
 			rtt.setAux(1);
 			rtt.setRTT("0");

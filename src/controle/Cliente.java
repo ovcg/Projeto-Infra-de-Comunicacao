@@ -6,17 +6,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
-
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-
-import base.EnviarMsg;
 import base.RTTEnviando;
 
 public class Cliente implements Runnable {
@@ -64,7 +60,6 @@ public class Cliente implements Runnable {
 			inputStream.read();
 
 			byte[] buffer = new byte[5000];
-			byte[] bufferCancelar = new byte[1024];
 			int bytesLidos = 0;
 			long tamArq = 0;
 			long arqEnviado = 0;
@@ -75,10 +70,7 @@ public class Cliente implements Runnable {
 			double tempoRestante = 0;
 
 			RTTEnviando rtt = new RTTEnviando(ip, rttEnv);
-			EnviarMsg msg=new EnviarMsg(ip);
-			Thread msg_thread=new Thread(msg);
-			msg_thread.start();
-			
+
 			Thread t = new Thread(rtt);
 			t.start();
 			rtt.setAux(0);
@@ -117,7 +109,9 @@ public class Cliente implements Runnable {
 				while ((bytesLidos = fileInput.read(buffer)) > 0) {// Enviando arquivo
 
 					if (cancelar == 1) {
-
+						
+						out.write(0);
+						out.flush();
 						tempoEstimado.setText("0");
 						enviar = 0;
 						rtt.setAux(1);
@@ -125,7 +119,7 @@ public class Cliente implements Runnable {
 						progressbar.setValue(0);
 						progressbar.setString(0 + " %");
 						progressbar.setStringPainted(true);
-						msg.setCancelar(cancelar);
+
 						break;
 
 					} else if (parar == 1) {
@@ -141,8 +135,7 @@ public class Cliente implements Runnable {
 						}
 
 					} else if (enviar == 1 && reiniciar == 1 && cancelar == 0 && parar == 0) {
-						
-						
+
 						arqEnviado = 0;
 						bytesLidos = 0;
 
