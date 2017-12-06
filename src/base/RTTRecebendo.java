@@ -43,7 +43,7 @@ public class RTTRecebendo implements Runnable {
 			InputStreamReader input = new InputStreamReader(inputStream);
 			BufferedReader buffer = new BufferedReader(input);
 			long tempoRTT = 0;
-			String flag = "RTT\n";
+			String flag = "rtt\n";
 			long tempoInicial;
 
 			while (true) {
@@ -64,9 +64,12 @@ public class RTTRecebendo implements Runnable {
 				while (!buffer.ready() && auxThread == 0)
 					;
 				if (buffer.ready()) {
-					if (buffer.readLine().equals("RTT2")) {
+					if (buffer.readLine().equals("rtt2")) {
 						tempoRTT = System.nanoTime() - tempoInicial;
 
+					}
+					else if(buffer.readLine().equals("pause")) {
+						showRTT.setText("Pause");
 					}
 				}
 				double rttms = tempoRTT / 1000000;
