@@ -49,6 +49,8 @@ public class Main extends JFrame {
 	private Cliente cliente;
 	private int enviar = 0;
 
+	private Thread t;
+
 	/**
 	 * Launch the application.
 	 */
@@ -215,7 +217,7 @@ public class Main extends JFrame {
 
 				String ip = textFieldIp.getText();
 				int porta = Integer.parseInt(textFieldPort.getText());
-			
+
 				if (ip == null || ip.equalsIgnoreCase("") || ip.length() < 6) {
 					JOptionPane.showMessageDialog(null, "Campo ip com erro!");
 				}
@@ -225,11 +227,10 @@ public class Main extends JFrame {
 						enviar = 1;
 						cliente = new Cliente(ip, porta, nomeArquivo, path, enviar, progressBar, rttEnv,
 								textFieldTempoEnv);
-						Thread t = new Thread(cliente);
+						t = new Thread(cliente);
 						t.start();
-					}
-					else {
-						enviar=1;
+					} else {
+						enviar = 1;
 						cliente.pararEnvio(0);
 					}
 				}
@@ -263,12 +264,15 @@ public class Main extends JFrame {
 
 		buttonCancelar = new JButton("Cancelar");// botão para cancelar
 		buttonCancelar.addActionListener(new ActionListener() {
+			@SuppressWarnings("deprecation")
 			public void actionPerformed(ActionEvent arg0) {
+				if(enviar==1) {
 				cliente.cancelarEnvio(1);
 				cliente.iniciar(0);
-				enviar=0;
+				t.stop();
+				enviar = 0;
 				JOptionPane.showMessageDialog(null, "Transferência cancelada!");
-
+				}
 			}
 		});
 		buttonCancelar.setBounds(352, 357, 117, 25);

@@ -86,7 +86,7 @@ public class RTTEnviando implements Runnable {
 				Thread.sleep(1000);
 
 				if (auxThread == 1) {
-
+					break;
 				}
 
 			}

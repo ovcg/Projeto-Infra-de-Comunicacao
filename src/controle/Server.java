@@ -11,13 +11,12 @@ import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.text.DecimalFormat;
-
 import javax.swing.JLabel;
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-
 import base.RTTRecebendo;
+
 
 public class Server implements Runnable {
 
@@ -26,8 +25,6 @@ public class Server implements Runnable {
 	private JProgressBar progressBar;
 	private JTextPane rttRec;
 	private JTextField tempoEstimado;
-
-	private int parar = 0;
 	private int cancelar = 0;
 	private int reiniciar = 0;
 	private JLabel lblIp;
@@ -50,7 +47,7 @@ public class Server implements Runnable {
 
 		byte prosseguir = 1;// sinal para continuar a receber os dados
 		byte[] buffer = new byte[5000];// tam do pacote
-		byte[] bufferCancel = new byte[1024];
+
 		int bytesLidos = 0;// bytes lidos
 		long tamArq = 0;// recebe tam do arquivo
 		long arqRecebido = 0;// variavel para calcular a porcentagem na progressbar
@@ -68,6 +65,7 @@ public class Server implements Runnable {
 			input = socket.getInputStream();
 			output = socket.getOutputStream();
 			output.write(prosseguir);
+
 
 			RTTRecebendo rtt = new RTTRecebendo(rttRec);
 			Thread t = new Thread(rtt);
@@ -109,54 +107,57 @@ public class Server implements Runnable {
 			data = new DataInputStream(input);
 
 			while ((bytesLidos = data.read(buffer)) > 0) {// Recebendo o arquivo
+				
+					if ((bytesLidos = data.read()) == 0) {
+						System.out.println("Cancelando transferência!");
+						progressBar.setValue(0);
+						progressBar.setString("0" + " %");
+						progressBar.setStringPainted(true);
+						tempoEstimado.setText("0");
+						rtt.setAux(1);
+						rtt.setRTT("0");
+						arquivo.delete();
 
-				if (buffer == bufferCancel && bytesLidos == 0) {
+						try {
 
-					progressBar.setValue(0);
-					progressBar.setString("0" + " %");
-					progressBar.setStringPainted(true);
-					tempoEstimado.setText("" + 0);
-					rtt.setAux(1);
-					rtt.setRTT("0");
+							Thread.sleep(1000);
 
-					try {
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} finally {
+							fileOutput.close();
+							data.close();
+							socket.close();
+							server.close();
+						}
+					} else {
+						fileOutput.write(buffer, 0, bytesLidos);
+						fileOutput.flush();
 
-						fileOutput.close();
-						data.close();
-						socket.close();
-						server.close();
-						Thread.sleep(1000);
-					} catch (InterruptedException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+						arqRecebido += bytesLidos;
+
+						// Atualizando ProgessBar
+
+						progressBar.setValue((int) ((arqRecebido * 100) / tamArq));
+						progressBar.setString(Long.toString((arqRecebido * 100) / tamArq) + " %");
+						progressBar.setStringPainted(true);
+
+						if (arqRecebido > 10000 && (System.currentTimeMillis() - atualizaTempo) > 1000) {
+
+							duracao = System.currentTimeMillis() - tempoInicial;
+							long div = arqRecebido / duracao;
+							vel = div * 1000;
+							tempoRestante = (tamArq - arqRecebido) / vel;
+							DecimalFormat dec = new DecimalFormat("#");
+							String auxDec = "" + dec.format(tempoRestante);
+							tempoEstimado.setText(auxDec);
+							atualizaTempo = System.currentTimeMillis();
+						}
+
 					}
-				} else {
-					fileOutput.write(buffer, 0, bytesLidos);
-					fileOutput.flush();
-
-					arqRecebido += bytesLidos;
-
-					// Atualizando ProgessBar
-
-					progressBar.setValue((int) ((arqRecebido * 100) / tamArq));
-					progressBar.setString(Long.toString((arqRecebido * 100) / tamArq) + " %");
-					progressBar.setStringPainted(true);
-
-					if (arqRecebido > 10000 && (System.currentTimeMillis() - atualizaTempo) > 1000) {
-
-						duracao = System.currentTimeMillis() - tempoInicial;
-						long div = arqRecebido / duracao;
-						vel = div * 1000;
-						tempoRestante = (tamArq - arqRecebido) / vel;
-						DecimalFormat dec = new DecimalFormat("#");
-						String auxDec = "" + dec.format(tempoRestante);
-						tempoEstimado.setText(auxDec);
-						atualizaTempo = System.currentTimeMillis();
-					}
-
 				}
-			}
-
+			
 			tempoEstimado.setText("" + 0);
 			rtt.setAux(1);
 			rtt.setRTT("0");
@@ -168,6 +169,8 @@ public class Server implements Runnable {
 		} catch (IOException e) {
 
 			e.printStackTrace();
+		} finally {
+
 		}
 
 	}

@@ -6,16 +6,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Inet4Address;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.nio.ByteBuffer;
 import java.text.DecimalFormat;
-
 import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
-
 import base.RTTEnviando;
 
 public class Cliente implements Runnable {
@@ -63,7 +60,6 @@ public class Cliente implements Runnable {
 			inputStream.read();
 
 			byte[] buffer = new byte[5000];
-			byte[] bufferCancelar = new byte[1024];
 			int bytesLidos = 0;
 			long tamArq = 0;
 			long arqEnviado = 0;
@@ -74,6 +70,7 @@ public class Cliente implements Runnable {
 			double tempoRestante = 0;
 
 			RTTEnviando rtt = new RTTEnviando(ip, rttEnv);
+
 			Thread t = new Thread(rtt);
 			t.start();
 			rtt.setAux(0);
@@ -113,18 +110,20 @@ public class Cliente implements Runnable {
 
 					if (cancelar == 1) {
 						
-						try {
-							out.write(bufferCancelar, 0, 0);
-							out.flush();
-							tempoEstimado.setText("" + 0);
-							enviar = 0;
-							rtt.setAux(1);
-							rtt.setRTT("0");
-							progressbar.setValue(0);
-							progressbar.setString(0 + " %");
-							progressbar.setStringPainted(true);
-							Thread.sleep(1000);
+						out.write(0);
+						out.flush();
+						tempoEstimado.setText("0");
+						enviar = 0;
+						rtt.setAux(1);
+						rtt.setRTT("0");
+						progressbar.setValue(0);
+						progressbar.setString(0 + " %");
+						progressbar.setStringPainted(true);
 
+						try {
+							System.out.println("Cancelando Transferência...");
+							Thread.sleep(1000);
+							return;
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
@@ -143,9 +142,32 @@ public class Cliente implements Runnable {
 
 						}
 
-					} else if (enviar == 1 && reiniciar == 1 && cancelar==0 && parar ==0) {
+					} else if (enviar == 1 && reiniciar == 1 && cancelar == 0 && parar == 0) {
 
-						
+						arqEnviado = 0;
+						bytesLidos = 0;
+
+						while ((bytesLidos = fileInput.read(buffer)) > 0) {// Enviando arquivo
+
+							out.write(buffer, 0, bytesLidos);
+							out.flush();
+							arqEnviado += bytesLidos;
+
+							// Atualizando ProgessBar
+							progressbar.setValue((int) ((arqEnviado * 100) / tamArq));
+							progressbar.setString(Long.toString(((arqEnviado * 100) / tamArq)) + " %");
+							progressbar.setStringPainted(true);
+
+							if (arqEnviado > 10000 && (System.currentTimeMillis() - atualizaTempo) > 1000) {
+								duracao = System.currentTimeMillis() - tempoInicial;
+								vel = 1000 * (arqEnviado / duracao);
+								tempoRestante = (tamArq - arqEnviado) / vel;
+								tempoEstimado.setText(String.valueOf(new DecimalFormat("#").format(tempoRestante)));
+								atualizaTempo = System.currentTimeMillis();
+							}
+
+						}
+
 					}
 
 					else {
