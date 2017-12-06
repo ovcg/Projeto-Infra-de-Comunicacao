@@ -108,12 +108,12 @@ public class Server implements Runnable {
 
 			while ((bytesLidos = data.read(buffer)) > 0) {// Recebendo o arquivo
 				
-					if ((bytesLidos = data.read(buffer)) == 0) {
+					if ((bytesLidos = data.read()) == 0) {
 						System.out.println("Cancelando transferência!");
 						progressBar.setValue(0);
 						progressBar.setString("0" + " %");
 						progressBar.setStringPainted(true);
-						tempoEstimado.setText("" + 0);
+						tempoEstimado.setText("0");
 						rtt.setAux(1);
 						rtt.setRTT("0");
 						arquivo.delete();

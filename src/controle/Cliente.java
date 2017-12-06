@@ -120,7 +120,14 @@ public class Cliente implements Runnable {
 						progressbar.setString(0 + " %");
 						progressbar.setStringPainted(true);
 
-						break;
+						try {
+							System.out.println("Cancelando Transferência...");
+							Thread.sleep(1000);
+							return;
+						} catch (InterruptedException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
 
 					} else if (parar == 1) {
 						System.out.println("Parando transferência!");
