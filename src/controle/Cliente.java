@@ -60,7 +60,6 @@ public class Cliente implements Runnable {
 			inputStream.read();
 
 			byte[] buffer = new byte[5000];
-			byte[] bufferCancel = new byte[1024];
 			int bytesLidos = 0;
 			long tamArq = 0;
 			long arqEnviado = 0;
@@ -110,8 +109,17 @@ public class Cliente implements Runnable {
 				while ((bytesLidos = fileInput.read(buffer)) > 0) {// Enviando arquivo
 
 					if (cancelar == 1) {
-						
-						
+						System.out.println("Cancelando Transferência...");
+						out.write(0);
+						out.flush();
+						tempoEstimado.setText("0");
+						enviar = 0;
+						rtt.setAux(1);
+						rtt.setRTT("0");
+						progressbar.setValue(0);
+						progressbar.setString(0 + " %");
+						progressbar.setStringPainted(true);
+
 						try {
 							System.out.println("Cancelando Transferência...");
 							out.write(0);
@@ -123,31 +131,23 @@ public class Cliente implements Runnable {
 							progressbar.setValue(0);
 							progressbar.setString(0 + " %");
 							progressbar.setStringPainted(true);
-							
+
+							System.out.println("Cancelando Transferência...");
 							Thread.sleep(1000);
-							return;
+
 						} catch (InterruptedException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 
 					} else if (parar == 1) {
-						System.out.println("Parando transferência!");
-						tempoEstimado.setText("Pause");
+						setParar(rtt, tempoEstimado);
 
-						while (parar == 1 && enviar == 0) {
-							rtt.setRTT("0.0");
-						}
-						if (parar == 0 && enviar == 1) {
-							rtt.setAux(0);
-							break;
-
-						}
-
-					} else if (enviar == 1 && reiniciar == 1 && cancelar == 0 && parar == 0) {
+					} else if (enviar == 1 && reiniciar==1) {
 
 						arqEnviado = 0;
 						bytesLidos = 0;
+						arqEnviado = 0;
 
 						while ((bytesLidos = fileInput.read(buffer)) > 0) {// Enviando arquivo
 
@@ -209,6 +209,26 @@ public class Cliente implements Runnable {
 		} catch (IOException e1) {
 			e1.printStackTrace();
 		}
+
+	}
+
+	public void setParar(RTTEnviando rtt, JTextField tempoEstimado) {
+		System.out.println("Parando transferência!");
+		tempoEstimado.setText("Pause");
+
+		while (parar == 1 && enviar == 0) {
+			rtt.setRTT("0.0");
+		}
+		if(parar==0 && enviar==1) {
+			return;
+		}
+	}
+
+	public void setCancelar() {
+
+	}
+
+	public void setReiniciar() {
 
 	}
 

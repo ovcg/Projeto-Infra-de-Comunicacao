@@ -185,6 +185,7 @@ public class Main extends JFrame {
 
 				Thread serverThread = new Thread(server);
 				serverThread.start();
+				
 			}
 		});
 		btnEscutar.setBounds(413, 12, 117, 25);
@@ -258,18 +259,18 @@ public class Main extends JFrame {
 		buttonReiniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				cliente.reiniciar(1);
+				
 				JOptionPane.showMessageDialog(null, "Transferência reiniciada!");
 			}
 		});
 
 		buttonCancelar = new JButton("Cancelar");// botão para cancelar
 		buttonCancelar.addActionListener(new ActionListener() {
-			@SuppressWarnings("deprecation")
+			
 			public void actionPerformed(ActionEvent arg0) {
 				if(enviar==1) {
 				cliente.cancelarEnvio(1);
 				cliente.iniciar(0);
-				t.stop();
 				enviar = 0;
 				JOptionPane.showMessageDialog(null, "Transferência cancelada!");
 				}
