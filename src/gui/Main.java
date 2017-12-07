@@ -185,7 +185,7 @@ public class Main extends JFrame {
 
 				Thread serverThread = new Thread(server);
 				serverThread.start();
-				
+
 			}
 		});
 		btnEscutar.setBounds(413, 12, 117, 25);
@@ -218,22 +218,14 @@ public class Main extends JFrame {
 
 				String ip = textFieldIp.getText();
 				int porta = Integer.parseInt(textFieldPort.getText());
-
-				if (ip == null || ip.equalsIgnoreCase("") || ip.length() < 6) {
-					JOptionPane.showMessageDialog(null, "Campo ip com erro!");
-				}
-
-				else {
-					if (enviar == 0) {
-						enviar = 1;
-						cliente = new Cliente(ip, porta, nomeArquivo, path, enviar, progressBar, rttEnv,
-								textFieldTempoEnv);
-						t = new Thread(cliente);
-						t.start();
-					} else {
-						enviar = 1;
-						cliente.pararEnvio(0);
-					}
+				if (enviar == 0) {
+					enviar = 1;
+					cliente = new Cliente(ip, porta, nomeArquivo, path, enviar, progressBar, rttEnv, textFieldTempoEnv);
+					t = new Thread(cliente);
+					t.start();
+				} else if(cliente.getReiniciar()==1) {
+					enviar = 1;
+					cliente.pararEnvio(0);
 				}
 
 			}
@@ -259,20 +251,21 @@ public class Main extends JFrame {
 		buttonReiniciar.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
 				cliente.reiniciar(1);
-				
 				JOptionPane.showMessageDialog(null, "Transferência reiniciada!");
+				
+				t.destroy();
 			}
 		});
 
 		buttonCancelar = new JButton("Cancelar");// botão para cancelar
 		buttonCancelar.addActionListener(new ActionListener() {
-			
+
 			public void actionPerformed(ActionEvent arg0) {
-				if(enviar==1) {
-				cliente.cancelarEnvio(1);
-				cliente.iniciar(0);
-				enviar = 0;
-				JOptionPane.showMessageDialog(null, "Transferência cancelada!");
+				if (enviar == 1) {
+					cliente.cancelarEnvio(1);
+					cliente.iniciar(0);
+					enviar = 0;
+					JOptionPane.showMessageDialog(null, "Transfer cancelada!");
 				}
 			}
 		});

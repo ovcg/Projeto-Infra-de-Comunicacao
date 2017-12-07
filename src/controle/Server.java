@@ -18,7 +18,6 @@ import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import base.RTTRecebendo;
 
-
 public class Server implements Runnable {
 
 	private int porta;
@@ -67,16 +66,16 @@ public class Server implements Runnable {
 			output = socket.getOutputStream();
 			output.write(prosseguir);
 
-
 			RTTRecebendo rtt = new RTTRecebendo(rttRec);
 			Thread t = new Thread(rtt);
 			t.start();
 			rtt.setAux(0);
 
+			
 			// Nome do arquivo
 			byte[] nomeArq = new byte[150];
 			input.read(nomeArq);
-
+			copia(nomeArq);			
 			String nome = new String(nomeArq, StandardCharsets.UTF_16);
 
 			nome = formataString(nome);
@@ -108,60 +107,34 @@ public class Server implements Runnable {
 			data = new DataInputStream(input);
 
 			while ((bytesLidos = data.read(buffer)) > 0) {// Recebendo o arquivo
-				
-					if (bytesLidos == 0) {
-						System.out.println("Cancelando transferência!");
-						progressBar.setValue(0);
-						progressBar.setString("0" + " %");
-						progressBar.setStringPainted(true);
-						tempoEstimado.setText("0");
-						rtt.setAux(1);
-						rtt.setRTT("0");
-						arquivo.delete();
 
-						try {
+				fileOutput.write(buffer, 0, bytesLidos);
+				fileOutput.flush();
 
-							Thread.sleep(1000);
+				arqRecebido += bytesLidos;
 
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} finally {
-							fileOutput.close();
-							data.close();
-							socket.close();
-							server.close();
-						}
-					} else {
-						fileOutput.write(buffer, 0, bytesLidos);
-						fileOutput.flush();
+				// Atualizando ProgessBar
 
-						arqRecebido += bytesLidos;
+				progressBar.setValue((int) ((arqRecebido * 100) / tamArq));
+				progressBar.setString(Long.toString((arqRecebido * 100) / tamArq) + " %");
+				progressBar.setStringPainted(true);
 
-						// Atualizando ProgessBar
+				if (arqRecebido > 10000 && (System.currentTimeMillis() - atualizaTempo) > 1000) {
 
-						progressBar.setValue((int) ((arqRecebido * 100) / tamArq));
-						progressBar.setString(Long.toString((arqRecebido * 100) / tamArq) + " %");
-						progressBar.setStringPainted(true);
-
-						if (arqRecebido > 10000 && (System.currentTimeMillis() - atualizaTempo) > 1000) {
-
-							duracao = System.currentTimeMillis() - tempoInicial;
-							long div = arqRecebido / duracao;
-							vel = div * 1000;
-							tempoRestante = (tamArq - arqRecebido) / vel;
-							DecimalFormat dec = new DecimalFormat("#");
-							String auxDec = "" + dec.format(tempoRestante);
-							tempoEstimado.setText(auxDec);
-							atualizaTempo = System.currentTimeMillis();
-						}
-
-					}
+					duracao = System.currentTimeMillis() - tempoInicial;
+					long div = arqRecebido / duracao;
+					vel = div * 1000;
+					tempoRestante = (tamArq - arqRecebido) / vel;
+					DecimalFormat dec = new DecimalFormat("#");
+					String auxDec = "" + dec.format(tempoRestante);
+					tempoEstimado.setText(auxDec);
+					atualizaTempo = System.currentTimeMillis();
 				}
-			if(arqRecebido!=tamArq) {
+			}
+			if (arqRecebido != tamArq) {
 				Files.delete(arquivo.toPath());
 			}
-			
+
 			tempoEstimado.setText("" + 0);
 			rtt.setAux(1);
 			rtt.setRTT("0");
@@ -175,6 +148,12 @@ public class Server implements Runnable {
 			e.printStackTrace();
 		}
 
+	}
+	
+	public void copia(byte[]a) {
+		byte[]b=new byte[a.length-3];
+		System.arraycopy(a,3,b,0,a.length);
+		a=b;
 	}
 
 	public String formataString(String in) {

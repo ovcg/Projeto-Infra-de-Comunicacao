@@ -14,6 +14,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JTextField;
 import javax.swing.JTextPane;
 import base.RTTEnviando;
+import java.lang.reflect.Array;
 
 public class Cliente implements Runnable {
 
@@ -21,13 +22,13 @@ public class Cliente implements Runnable {
 	private int porta = 0;
 	private String nomeArq;
 	private String path;
-	private int enviar;
+	private volatile int enviar;
 	private JProgressBar progressbar;
 	private JTextPane rttEnv;
 	private JTextField tempoEstimado;
-	private int parar = 0;
-	private int cancelar = 0;
-	private int reiniciar = 0;
+	private volatile int parar;
+	private volatile int cancelar;
+	private volatile int reiniciar;
 
 	public Cliente(String ip, int porta, String nomeArq, String path, int enviar, JProgressBar progress,
 			JTextPane rttEnv, JTextField tempoEstimado) {
@@ -80,24 +81,49 @@ public class Cliente implements Runnable {
 				File file = new File(path);
 				tamArq = file.length();
 				nomeArq = file.getName();
-
+				
+				byte[] cabecalho=new byte[3];
+				cabecalho[0]=0;
+				cabecalho[1]=1;
+				cabecalho[2]=1;
+				byte[] corpo=nomeArq.getBytes("UTF_16");
+				
+				copiarArray(cabecalho,corpo);			
+				
 				System.out.println("Cliente enviando nome do arquivo:" + nomeArq);
 				// Enviando nome do arquivo
-				outputStream.write(nomeArq.getBytes("UTF_16"));
+				outputStream.write(corpo);
 				inputStream.read();
-
+				
+				cabecalho[0]=1;
+				cabecalho[1]=0;
+				cabecalho[2]=0;						
+				
 				String ipEnv = InetAddress.getLocalHost().getHostAddress();// Enviando IP
-				outputStream.write(ipEnv.getBytes("UTF_16"));
+				byte[]corpoIP=ipEnv.getBytes("UTF_16");
+				copiarArray(cabecalho,corpoIP);					
+				outputStream.write(corpoIP);
 				inputStream.read();
-
 				System.out.println("Cliente enviando IP: " + ipEnv);
+				
 				int mega = 1000000;
 				System.out.println("Cliente enviando tamanho do arquivo: " + tamArq / mega + " MB");
 
 				// Envia tamanho do arquivo
+				cabecalho[0]=1;
+				cabecalho[1]=0;
+				cabecalho[2]=1;	
+			
+				String a=""+tamArq;
+				byte[] corpoTam=a.getBytes("UTF-16");
+				copiarArray(cabecalho,corpoTam);
+				
+				/*
 				ByteBuffer bufferTam = ByteBuffer.allocate(Long.BYTES);
-				bufferTam.putLong(tamArq);
+				bufferTam.putLong(tamArq);				
 				outputStream.write(bufferTam.array(), 0, Long.BYTES);
+				*/
+				outputStream.write(corpoTam);
 				inputStream.read();
 
 				tempoInicial = System.currentTimeMillis();
@@ -105,71 +131,34 @@ public class Cliente implements Runnable {
 
 				fileInput = new FileInputStream(file);
 				out = new DataOutputStream(outputStream);
+				
+				
 
-				while ((bytesLidos = fileInput.read(buffer)) > 0) {// Enviando arquivo
-
+				while((bytesLidos = fileInput.read(buffer)) > 0) {// Enviando arquivo
+					
+					cabecalho[0]=1;
+					cabecalho[1]=0;
+					cabecalho[2]=1;	
+					copiarArray(cabecalho, buffer);
+					
 					if (cancelar == 1) {
-						System.out.println("Cancelando Transferência...");
-						out.write(0);
-						out.flush();
-						tempoEstimado.setText("0");
-						enviar = 0;
-						rtt.setAux(1);
-						rtt.setRTT("0");
-						progressbar.setValue(0);
-						progressbar.setString(0 + " %");
-						progressbar.setStringPainted(true);
-
-						try {
-							System.out.println("Cancelando Transferência...");
-							out.write(0);
-							out.flush();
-							tempoEstimado.setText("0");
-							enviar = 0;
-							rtt.setAux(1);
-							rtt.setRTT("0");
-							progressbar.setValue(0);
-							progressbar.setString(0 + " %");
-							progressbar.setStringPainted(true);
-
-							System.out.println("Cancelando Transferência...");
-							Thread.sleep(1000);
-
-						} catch (InterruptedException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
+						byte[] cancel=new byte[3];
+						cancel[0]=1;				
 
 					} else if (parar == 1) {
-						setParar(rtt, tempoEstimado);
+						System.out.println("Parando transferência!");
+						tempoEstimado.setText("Pause");
 
-					} else if (enviar == 1 && reiniciar==1) {
-
-						arqEnviado = 0;
-						bytesLidos = 0;
-						arqEnviado = 0;
-
-						while ((bytesLidos = fileInput.read(buffer)) > 0) {// Enviando arquivo
-
-							out.write(buffer, 0, bytesLidos);
-							out.flush();
-							arqEnviado += bytesLidos;
-
-							// Atualizando ProgessBar
-							progressbar.setValue((int) ((arqEnviado * 100) / tamArq));
-							progressbar.setString(Long.toString(((arqEnviado * 100) / tamArq)) + " %");
-							progressbar.setStringPainted(true);
-
-							if (arqEnviado > 10000 && (System.currentTimeMillis() - atualizaTempo) > 1000) {
-								duracao = System.currentTimeMillis() - tempoInicial;
-								vel = 1000 * (arqEnviado / duracao);
-								tempoRestante = (tamArq - arqEnviado) / vel;
-								tempoEstimado.setText(String.valueOf(new DecimalFormat("#").format(tempoRestante)));
-								atualizaTempo = System.currentTimeMillis();
-							}
-
+						while (parar == 1 && enviar == 0) {
+							rtt.setRTT("0.0");
+						}
+						if(parar==0 && enviar==1) {
+							break;
 						}
 
+					} else if (enviar == 1 && reiniciar==1) {
+						break;					
+						
 					}
 
 					else {
@@ -189,11 +178,8 @@ public class Cliente implements Runnable {
 							tempoEstimado.setText(String.valueOf(new DecimalFormat("#").format(tempoRestante)));
 							atualizaTempo = System.currentTimeMillis();
 						}
-
 					}
-
 				}
-
 			}
 
 			tempoEstimado.setText("" + 0);
@@ -211,25 +197,26 @@ public class Cliente implements Runnable {
 		}
 
 	}
-
-	public void setParar(RTTEnviando rtt, JTextField tempoEstimado) {
-		System.out.println("Parando transferência!");
-		tempoEstimado.setText("Pause");
-
-		while (parar == 1 && enviar == 0) {
-			rtt.setRTT("0.0");
-		}
-		if(parar==0 && enviar==1) {
-			return;
-		}
+	public void copiarArray(byte[]a,byte[]b) {
+		byte[]c=new byte[b.length+3];
+		System.arraycopy(a,0,c,0,3);
+		System.arraycopy(b, 3,c,3,b.length);
+		b=c;
 	}
-
-	public void setCancelar() {
-
+	public byte[] copia() {
+		byte[]c=null;
+		
+		return c;
 	}
-
-	public void setReiniciar() {
-
+	
+	public int getReiniciar() {
+		return this.reiniciar;
+	}
+	public int getParar() {
+		return this.parar;
+	}
+	public int getEnviar() {
+		return this.enviar;
 	}
 
 	public void iniciar(int enviar) {
@@ -250,4 +237,5 @@ public class Cliente implements Runnable {
 		this.reiniciar = reiniciar;
 	}
 
+	
 }
